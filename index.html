@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radiant Living - 游戏攻略图鉴</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="打开菜单">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="mobile-logo">
+      <div class="brand-logo">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+      </div>
+      <h1>Radiant Living</h1>
+    </div>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <script>
+        if (window.innerWidth > 768 && localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.getElementById('sidebar').classList.add('collapsed');
+        }
+      </script>
+
+      <div class="sidebar-brand">
+        <div class="flex items-center gap-3">
+          <div class="brand-logo">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+          </div>
+          <div class="sidebar-brand-text">
+            <h1 class="text-xl font-bold text-primary tracking-tight">Radiant Living</h1>
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-muted">Hearthside Editorial</p>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item active">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+          <span>首页</span>
+        </a>
+        <a href="guides.html" class="nav-item">
+          <span class="material-symbols-outlined">menu_book</span>
+          <span>攻略</span>
+        </a>
+        <a href="database.html" class="nav-item">
+          <span class="material-symbols-outlined">database</span>
+          <span>图鉴</span>
+        </a>
+        <a href="calculator.html" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span>
+          <span>数值与计算</span>
+        </a>
+        <a href="timer.html" class="nav-item">
+          <span class="material-symbols-outlined">timer</span>
+          <span>计时器</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Sidebar Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle collapsed-trigger" id="sidebarToggle" aria-label="折叠/展开导航栏">
+      <span class="material-symbols-outlined toggle-icon">chevron_left</span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section class="hero mb-8">
+        <div class="hero-bg"></div>
+        <div class="hero-blur-1"></div>
+        <div class="hero-blur-2"></div>
+        
+        <div class="flex justify-between items-end mb-8 relative z-10">
+          <div>
+            <span class="badge badge-rare mb-4">Master Guides</span>
+            <h2 class="text-display text-primary tracking-tight mb-4">探索大师指南</h2>
+            <p class="text-xl text-muted max-w-2xl">
+              深度解读游戏艺术，从宏大的叙事结构到极致的数值优化，为你开启沉浸式的探索之旅。
+            </p>
+          </div>
+          <div class="flex gap-4 desktop-only">
+            <button class="btn-icon" aria-label="搜索">
+              <span class="material-symbols-outlined">search</span>
+            </button>
+            <button class="btn-icon" aria-label="筛选">
+              <span class="material-symbols-outlined">tune</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Chips -->
+        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+          <button class="chip chip-primary">全部指南</button>
+          <button class="chip chip-default">角色扮演</button>
+          <button class="chip chip-default">动作策略</button>
+          <button class="chip chip-default">极速竞速</button>
+          <button class="chip chip-default">独立精品</button>
+          <button class="chip chip-default">竞技对抗</button>
+        </div>
+      </section>
+
+      <!-- Bento Grid Content -->
+      <div class="bento">
+        <!-- Main Featured Card -->
+        <article class="featured-card bento-featured group cursor-pointer">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='560'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&q=80" alt="Fantasy world">
+          <div class="featured-overlay"></div>
+          <div class="featured-content">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="badge badge-hot">Editor's Choice</span>
+              <span class="text-sm text-white/60">预计阅读 15 分钟</span>
+            </div>
+            <h3 class="text-4xl font-bold text-white mb-4 leading-tight">最终幻想：构筑永恒的幻想美学指南</h3>
+            <p class="text-white/80 text-lg max-w-xl mb-8">
+              解析系列作中的视觉语言演变，从天野喜孝的笔触到现代光影追踪的极致运用。
+            </p>
+            <div class="flex items-center gap-6">
+              <a href="guides.html" class="btn btn-primary">
+                立即开始阅读
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+              <div class="avatar-group">
+                <img class="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="User 1">
+                <img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt="User 2">
+                <div class="avatar-more">+12</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Speedrun Path Card -->
+        <article class="card bento-span-4 group">
+          <div class="mb-auto">
+            <div class="w-16 h-16 rounded-lg bg-secondary-container flex items-center justify-center text-secondary mb-8 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">速通路经：极限效率手册</h3>
+            <p class="text-muted leading-relaxed mb-8">
+              为追求完美的挑战者准备。涵盖目前全球排名前十的竞速路线优化与关键跳关点解析。
+            </p>
+          </div>
+          <div>
+            <ul class="space-y-4 mb-8">
+              <li class="flex items-center gap-3">
+                <span class="list-dot"></span>
+                <span class="text-sm">初始区域：3分12秒完美流程</span>
+              </li>
+              <li class="flex items-center gap-3">
+                <span class="list-dot"></span>
+                <span class="text-sm">全BOSS触发时机与逻辑漏洞</span>
+              </li>
+            </ul>
+            <a href="guides.html" class="btn btn-secondary w-full">解锁路线图</a>
+          </div>
+        </article>
+
+        <!-- Small Grid Cards -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-64 rounded-lg overflow-hidden mb-6">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='256'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80" alt="Open world">
+            <span class="badge badge-new absolute top-4 left-4">新指南</span>
+          </div>
+          <h4 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors">开放世界生存：环境互动机理</h4>
+          <p class="text-muted text-sm">深度解析天气系统对NPC行为的动态影响。</p>
+        </article>
+
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-64 rounded-lg overflow-hidden mb-6">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='256'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80" alt="Retro gaming">
+          </div>
+          <h4 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors">复古硬件：在现代屏幕上还原质感</h4>
+          <p class="text-muted text-sm">Shader配置与CRT滤镜的终极调校方案。</p>
+        </article>
+
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-64 rounded-lg overflow-hidden mb-6">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='256'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80" alt="Esports">
+            <button class="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg" aria-label="收藏">
+              <span class="material-symbols-outlined text-sm">bookmark</span>
+            </button>
+          </div>
+          <h4 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors">竞技博弈：心理战与视野压制</h4>
+          <p class="text-muted text-sm">超越操作的艺术，如何利用信息差掌控赛场。</p>
+        </article>
+      </div>
+
+      <!-- Weekly Special Section -->
+      <section class="card mt-8 relative overflow-hidden">
+        <div class="relative z-10 special-section-grid">
+          <div>
+            <h3 class="text-3xl font-bold mb-6">本周专题：沉浸感之源</h3>
+            <p class="text-muted leading-relaxed mb-8">
+              我们邀请了三位顶尖关卡设计师，共同探讨声音、触觉反馈与视觉引导如何共同作用，构建出令人流连忘返的虚拟世界。
+            </p>
+            <div class="space-y-4">
+              <div class="list-item">
+                <span class="text-2xl font-black text-primary opacity-20">01</span>
+                <span class="font-bold">空间音频的叙事技巧</span>
+              </div>
+              <div class="list-item">
+                <span class="text-2xl font-black text-primary opacity-20">02</span>
+                <span class="font-bold">非侵入式UI的色彩引导</span>
+              </div>
+            </div>
+          </div>
+          <div class="special-images-grid">
+            <img class="rounded-lg h-48 w-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1593640408182-31c228b07710?w=400&q=80" alt="Gaming setup">
+            <img class="rounded-lg h-48 w-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&q=80" alt="Microphone">
+            <img class="rounded-lg h-48 w-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80" alt="Controller">
+            <img class="rounded-lg h-48 w-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" alt="Headphones">
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Navigation -->
+      <section class="quick-nav-grid mt-8">
+        <a href="database.html" class="card text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-primary-container/20 mx-auto mb-4 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-3xl">inventory_2</span>
+          </div>
+          <h4 class="font-bold mb-2">物品图鉴</h4>
+          <p class="text-sm text-muted">探索完整收藏</p>
+        </a>
+        <a href="calculator.html" class="card text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-secondary-container/20 mx-auto mb-4 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-3xl">science</span>
+          </div>
+          <h4 class="font-bold mb-2">数值计算</h4>
+          <p class="text-sm text-muted">精准数据分析</p>
+        </a>
+        <a href="timer.html" class="card text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-tertiary-container/20 mx-auto mb-4 flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-3xl">schedule</span>
+          </div>
+          <h4 class="font-bold mb-2">首领计时</h4>
+          <p class="text-sm text-muted">不错过任何刷新</p>
+        </a>
+        <a href="guides.html" class="card text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-surface-container-highest mx-auto mb-4 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-3xl">auto_stories</span>
+          </div>
+          <h4 class="font-bold mb-2">攻略中心</h4>
+          <p class="text-sm text-muted">大师级指南</p>
+        </a>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-8 pt-8 border-t" style="border-color: rgba(186, 177, 155, 0.2);">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-sm font-bold opacity-60">Radiant Living - Hearthside Lab</p>
+            <p class="text-xs opacity-40 mt-1">为每一位冒险者照亮前行的道路</p>
+          </div>
+          <div class="flex gap-4">
+            <a href="#" class="btn-icon-sm" aria-label="GitHub">
+              <span class="material-symbols-outlined text-lg">code</span>
+            </a>
+            <a href="#" class="btn-icon-sm" aria-label="Discord">
+              <span class="material-symbols-outlined text-lg">forum</span>
+            </a>
+            <a href="#" class="btn-icon-sm" aria-label="关于">
+              <span class="material-symbols-outlined text-lg">info</span>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

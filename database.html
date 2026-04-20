@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图鉴 - Radiant Living</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="打开菜单">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="mobile-logo">
+      <div class="brand-logo">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+      </div>
+      <h1>物品图鉴</h1>
+    </div>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <script>
+        if (window.innerWidth > 768 && localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.getElementById('sidebar').classList.add('collapsed');
+        }
+      </script>
+
+      <div class="sidebar-brand">
+        <div class="flex items-center gap-3">
+          <div class="brand-logo">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+          </div>
+          <div class="sidebar-brand-text">
+            <h1 class="text-xl font-bold text-primary tracking-tight">Radiant Living</h1>
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-muted">Hearthside Editorial</p>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <span class="material-symbols-outlined">home</span>
+          <span>首页</span>
+        </a>
+        <a href="guides.html" class="nav-item">
+          <span class="material-symbols-outlined">menu_book</span>
+          <span>攻略</span>
+        </a>
+        <a href="database.html" class="nav-item active">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">database</span>
+          <span>图鉴</span>
+        </a>
+        <a href="calculator.html" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span>
+          <span>数值与计算</span>
+        </a>
+        <a href="timer.html" class="nav-item">
+          <span class="material-symbols-outlined">timer</span>
+          <span>计时器</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Sidebar Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle collapsed-trigger" id="sidebarToggle" aria-label="折叠/展开导航栏">
+      <span class="material-symbols-outlined toggle-icon">chevron_left</span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <section class="hero mb-8">
+        <div class="hero-bg"></div>
+        
+        <div class="flex justify-between items-end mb-8 relative z-10">
+          <div>
+            <span class="badge badge-rare mb-4">Database</span>
+            <h2 class="text-display text-primary tracking-tight mb-4">完整图鉴</h2>
+            <p class="text-xl text-muted max-w-2xl">
+              收录游戏中所有物品、装备、材料的完整数据。
+            </p>
+          </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="flex gap-4 mb-6">
+          <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted">search</span>
+            <input type="text" class="input input-search w-full" placeholder="搜索物品名称...">
+          </div>
+        </div>
+
+        <!-- Category Chips -->
+        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+          <button class="chip chip-primary">全部</button>
+          <button class="chip chip-default">武器</button>
+          <button class="chip chip-default">防具</button>
+          <button class="chip chip-default">消耗品</button>
+          <button class="chip chip-default">材料</button>
+          <button class="chip chip-default">任务物品</button>
+        </div>
+      </section>
+
+      <!-- Items Grid -->
+      <div class="bento">
+        <!-- Legendary Item -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-yellow-600">military_tech</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-hot">传说</span>
+                <span class="text-xs text-muted">武器</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">龙炎之剑</h4>
+              <p class="text-sm text-muted">传说级双手剑，附带火焰伤害</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t" style="border-color: rgba(186, 177, 155, 0.2);">
+            <div class="flex justify-between text-sm">
+              <span class="text-muted">攻击力</span>
+              <span class="font-bold text-primary">245-310</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Rare Item -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-purple-600">shield</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-rare">稀有</span>
+                <span class="text-xs text-muted">防具</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">暗影披风</h4>
+              <p class="text-sm text-muted">稀有级轻甲披风，提升闪避率</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t" style="border-color: rgba(186, 177, 155, 0.2);">
+            <div class="flex justify-between text-sm">
+              <span class="text-muted">防御力</span>
+              <span class="font-bold text-primary">+85</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Epic Item -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-blue-600">auto_fix_high</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-new">史诗</span>
+                <span class="text-xs text-muted">消耗品</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">超级治疗药剂</h4>
+              <p class="text-sm text-muted">恢复100%生命值并移除负面状态</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t" style="border-color: rgba(186, 177, 155, 0.2);">
+            <div class="flex justify-between text-sm">
+              <span class="text-muted">效果</span>
+              <span class="font-bold text-secondary">HP +100%</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Common Item -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-surface-container-highest flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-muted">inventory_2</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs px-2 py-0.5 rounded-full bg-surface-container-high text-muted">普通</span>
+                <span class="text-xs text-muted">材料</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">铁矿石</h4>
+              <p class="text-sm text-muted">基础锻造材料，可用于制作武器</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Rare Material -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-green-600">eco</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-rare">稀有</span>
+                <span class="text-xs text-muted">材料</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">月光草</h4>
+              <p class="text-sm text-muted">稀有草药，用于炼制高级药剂</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Epic Weapon -->
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl text-red-600">gavel</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-new">史诗</span>
+                <span class="text-xs text-muted">武器</span>
+              </div>
+              <h4 class="text-lg font-bold mb-1 group-hover:text-primary transition-colors">巨人之锤</h4>
+              <p class="text-sm text-muted">重型双手锤，附带眩晕效果</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t" style="border-color: rgba(186, 177, 155, 0.2);">
+            <div class="flex justify-between text-sm">
+              <span class="text-muted">攻击力</span>
+              <span class="font-bold text-primary">180-220</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Spacer for FAB -->
+      <div class="h-32"></div>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

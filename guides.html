@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>攻略 - Radiant Living</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="打开菜单">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <div class="mobile-logo">
+      <div class="brand-logo">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+      </div>
+      <h1>攻略中心</h1>
+    </div>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <script>
+        if (window.innerWidth > 768 && localStorage.getItem('sidebar-collapsed') === 'true') {
+          document.getElementById('sidebar').classList.add('collapsed');
+        }
+      </script>
+
+      <div class="sidebar-brand">
+        <div class="flex items-center gap-3">
+          <div class="brand-logo">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fireplace</span>
+          </div>
+          <div class="sidebar-brand-text">
+            <h1 class="text-xl font-bold text-primary tracking-tight">Radiant Living</h1>
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-muted">Hearthside Editorial</p>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <span class="material-symbols-outlined">home</span>
+          <span>首页</span>
+        </a>
+        <a href="guides.html" class="nav-item active">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+          <span>攻略</span>
+        </a>
+        <a href="database.html" class="nav-item">
+          <span class="material-symbols-outlined">database</span>
+          <span>图鉴</span>
+        </a>
+        <a href="calculator.html" class="nav-item">
+          <span class="material-symbols-outlined">calculate</span>
+          <span>数值与计算</span>
+        </a>
+        <a href="timer.html" class="nav-item">
+          <span class="material-symbols-outlined">timer</span>
+          <span>计时器</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Sidebar Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle collapsed-trigger" id="sidebarToggle" aria-label="折叠/展开导航栏">
+      <span class="material-symbols-outlined toggle-icon">chevron_left</span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <section class="hero mb-8">
+        <div class="hero-bg"></div>
+        <div class="hero-blur-1"></div>
+        
+        <div class="flex justify-between items-end mb-8 relative z-10">
+          <div>
+            <span class="badge badge-rare mb-4">Guides</span>
+            <h2 class="text-display text-primary tracking-tight mb-4">大师级攻略</h2>
+            <p class="text-xl text-muted max-w-2xl">
+              从入门到精通，涵盖战斗技巧、剧情解析、资源管理等全方位指南。
+            </p>
+          </div>
+          <div class="flex gap-4 desktop-only">
+            <button class="btn-icon" aria-label="搜索">
+              <span class="material-symbols-outlined">search</span>
+            </button>
+            <button class="btn-icon" aria-label="筛选">
+              <span class="material-symbols-outlined">tune</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+          <button class="chip chip-primary">全部</button>
+          <button class="chip chip-default">战斗技巧</button>
+          <button class="chip chip-default">剧情解析</button>
+          <button class="chip chip-default">资源管理</button>
+          <button class="chip chip-default">隐藏要素</button>
+          <button class="chip chip-default">成就攻略</button>
+        </div>
+      </section>
+
+      <!-- Featured Guide -->
+      <article class="featured-card mb-8 group cursor-pointer">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='560'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&q=80" alt="Featured guide">
+        <div class="featured-overlay"></div>
+        <div class="featured-content">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="badge badge-hot">Featured</span>
+            <span class="text-sm text-white/60">高级教程</span>
+          </div>
+          <h3 class="text-4xl font-bold text-white mb-4">终极战斗系统完全指南</h3>
+          <p class="text-white/80 text-lg max-w-xl mb-8">
+            深入解析游戏核心战斗机制，从基础连招到高级技巧，助你成为战斗大师。
+          </p>
+          <a href="#" class="btn btn-primary">
+            开始阅读
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- Guides Grid -->
+      <div class="bento">
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-48 rounded-lg overflow-hidden mb-4">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80" alt="Guide thumbnail">
+            <span class="badge badge-new absolute top-4 left-4">新</span>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-primary font-semibold">战斗技巧</span>
+            <span class="text-xs text-muted">12 分钟阅读</span>
+          </div>
+          <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">BOSS战终极指南：影龙篇</h4>
+          <p class="text-sm text-muted">详细解析影龙的所有攻击模式与完美应对策略</p>
+        </article>
+
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-48 rounded-lg overflow-hidden mb-4">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80" alt="Guide thumbnail">
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-secondary font-semibold">剧情解析</span>
+            <span class="text-xs text-muted">8 分钟阅读</span>
+          </div>
+          <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">深层叙事：世界观的隐藏秘密</h4>
+          <p class="text-sm text-muted">挖掘游戏剧情中容易被忽略的深层含义</p>
+        </article>
+
+        <article class="card group cursor-pointer bento-span-4">
+          <div class="relative h-48 rounded-lg overflow-hidden mb-4">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='192'%3E%3Crect fill='%23f6edda' width='100%25' height='100%25'/%3E%3C/svg%3E" data-src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80" alt="Guide thumbnail">
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-tertiary font-semibold">资源管理</span>
+            <span class="text-xs text-muted">15 分钟阅读</span>
+          </div>
+          <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">高效刷资源路线图</h4>
+          <p class="text-sm text-muted">最优化的资源获取路线，节省你的时间</p>
+        </article>
+      </div>
+
+      <!-- Load More -->
+      <div class="text-center mt-8">
+        <button class="btn btn-outline">
+          加载更多指南
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
