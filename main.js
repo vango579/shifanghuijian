@@ -461,7 +461,7 @@ const ItemGallery = {
 
   async loadCSVData() {
     try {
-      const response = await fetch('终极掉落百科表_带职业限制与刷新点位及属性_20260417_183805.csv');
+      const response = await fetch('item/mxyzc/终极掉落百科表_带职业限制与刷新点位及属性_20260417_183805.csv');
       const csvText = await response.text();
       this.items = this.parseCSV(csvText);
       this.filteredItems = [...this.items];

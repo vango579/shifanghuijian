@@ -50,15 +50,22 @@ const Components = {
     const mainContent = document.querySelector('.main-content');
     
     if (toggleBtn && sidebar && mainContent) {
+      // 从 localStorage 恢复侧边栏状态
+      const savedState = localStorage.getItem('sidebarCollapsed');
+      if (savedState === 'true') {
+        sidebar.classList.add('collapsed');
+        mainContent.style.marginLeft = '72px';
+      }
+      
       toggleBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         
         if (sidebar.classList.contains('collapsed')) {
-          sidebar.style.width = '64px';
-          mainContent.style.marginLeft = '64px';
+          mainContent.style.marginLeft = '72px';
+          localStorage.setItem('sidebarCollapsed', 'true');
         } else {
-          sidebar.style.width = '200px';
-          mainContent.style.marginLeft = '200px';
+          mainContent.style.marginLeft = '220px';
+          localStorage.setItem('sidebarCollapsed', 'false');
         }
       });
     }
