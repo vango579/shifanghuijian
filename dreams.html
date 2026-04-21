@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梦想与征程 - 十方汇鉴</title>
+<link rel="icon" type="image/png" href="icon/app_icon_round.png">
+<link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dream">
+
+<!-- 侧边栏 -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <img src="icon/logo.png" alt="十方汇鉴" class="sidebar-logo">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <span>chevron_right</span>
+    </button>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <a class="nav-btn" data-page="home" href="index.html">
+      <i class="fas fa-home"></i>
+      <span class="nav-text">首页</span>
+    </a>
+    <a class="nav-btn active" data-page="dream" href="dreams.html">
+      <i class="fas fa-rocket"></i>
+      <span class="nav-text">梦想与征程</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- 主内容区 -->
+<main class="main-content">
+  <!-- 顶部导航 - 包含攻略、图鉴、数值、计时器 -->
+  <header class="top-nav">
+    <div class="top-nav-left">
+      <h1 class="top-nav-title" id="pageTitle">梦想与征程</h1>
+      
+      <!-- 页面导航按钮 -->
+      <nav class="page-nav" id="pageNav">
+        <button class="page-nav-btn active" data-page="dream-home">
+          <i class="fas fa-book-open"></i>
+          攻略
+        </button>
+        <button class="page-nav-btn" data-page="dream-gallery">
+          <i class="fas fa-book"></i>
+          图鉴
+        </button>
+        <button class="page-nav-btn" data-page="dream-calc">
+          <i class="fas fa-calculator"></i>
+          数值
+        </button>
+        <button class="page-nav-btn" data-page="dream-timer">
+          <i class="fas fa-clock"></i>
+          计时器
+        </button>
+      </nav>
+    </div>
+    
+    <div class="top-nav-actions">
+      <i class="fas fa-bell"></i>
+      <i class="fas fa-cog"></i>
+    </div>
+  </header>
+
+  <!-- 内容区域 -->
+  <div class="page-content">
+    
+    <!-- 梦想首页 - 攻略 -->
+    <div class="page-container active" id="page-dream-home">
+      <section class="hero-section">
+        <div class="glow-effect glow-1"></div>
+        <h2 class="hero-title">梦想与征程</h2>
+        <p class="hero-subtitle">开启你的冒险之旅，探索未知的领域，书写属于你的传奇故事。</p>
+      </section>
+
+      <!-- 游戏攻略分类 -->
+      <div class="guide-section">
+        <h3><i class="fas fa-book-open"></i> 新手入门</h3>
+        
+        <div class="guide-card">
+          <h4>角色创建与职业选择</h4>
+          <p>了解游戏中的四大职业定位：突击型、支援型、防御型和特工型。根据你的游戏风格选择最适合你的职业。</p>
+          <div class="guide-meta">
+            <span><i class="fas fa-calendar-alt"></i> 5分钟</span>
+            <span><i class="fas fa-user"></i> 入门</span>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <h4>基础操作指南</h4>
+          <p>掌握移动、攻击、技能释放等基础操作。熟悉战斗节奏是通关的关键。</p>
+          <div class="guide-meta">
+            <span><i class="fas fa-calendar-alt"></i> 10分钟</span>
+            <span><i class="fas fa-user"></i> 入门</span>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <h4>资源获取与经济系统</h4>
+          <p>了解游戏中各种资源的获取方式，包括金币、经验和特殊材料。合理规划资源使用能让你的成长更加顺利。</p>
+          <div class="guide-meta">
+            <span><i class="fas fa-calendar-alt"></i> 15分钟</span>
+            <span><i class="fas fa-user"></i> 进阶</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <h3><i class="fas fa-shield-alt"></i> 战斗技巧</h3>
+        
+        <div class="guide-card">
+          <h4>连招系统详解</h4>
+          <p>学习如何组合技能形成强力连招。不同的技能组合会产生意想不到的效果。</p>
+          <div class="guide-meta">
+            <span><i class="fas fa-calendar-alt"></i> 20分钟</span>
+            <span><i class="fas fa-user"></i> 进阶</span>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <h4>Boss战攻略</h4>
+          <p>各章节Boss的攻击模式和弱点分析。掌握正确的躲避时机和输出窗口。</p>
+          <div class="guide-meta">
+            <span><i class="fas fa-calendar-alt"></i> 30分钟</span>
+            <span><i class="fas fa-user"></i> 高阶</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 梦想图鉴 -->
+    <div class="page-container" id="page-dream-gallery">
+      <div class="gallery-layout">
+        <!-- 左侧：筛选和搜索 -->
+        <aside class="gallery-sidebar">
+          <!-- 搜索框 -->
+          <div class="gallery-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="gallerySearchInput" placeholder="搜索道具名称...">
+          </div>
+
+          <!-- 筛选器 -->
+          <div class="gallery-filters">
+            <h4 class="filter-title">品阶筛选</h4>
+            <div class="filter-buttons" id="filter-tier">
+              <button class="filter-btn active" data-value="全部">全部</button>
+              <button class="filter-btn" data-value="普通">普通</button>
+              <button class="filter-btn" data-value="稀有">稀有</button>
+              <button class="filter-btn" data-value="英雄">英雄</button>
+              <button class="filter-btn" data-value="传说">传说</button>
+            </div>
+
+            <h4 class="filter-title">道具分类</h4>
+            <div class="filter-buttons" id="filter-category">
+              <button class="filter-btn active" data-value="全部">全部</button>
+              <button class="filter-btn" data-value="武器">武器</button>
+              <button class="filter-btn" data-value="防具">防具</button>
+              <button class="filter-btn" data-value="材料">材料</button>
+            </div>
+
+            <h4 class="filter-title">适用职业</h4>
+            <div class="filter-buttons" id="filter-class">
+              <button class="filter-btn active" data-value="全部">全部</button>
+              <button class="filter-btn" data-value="突击型">突击型</button>
+              <button class="filter-btn" data-value="支援型">支援型</button>
+              <button class="filter-btn" data-value="防御型">防御型</button>
+              <button class="filter-btn" data-value="特工型">特工型</button>
+              <button class="filter-btn" data-value="全职业">全职业</button>
+            </div>
+          </div>
+
+          <!-- 统计信息 -->
+          <div class="gallery-stats">
+            <span>共 <strong id="itemCount">0</strong> 个道具</span>
+          </div>
+        </aside>
+
+        <!-- 中间：道具列表 -->
+        <div class="gallery-items" id="galleryItems">
+          <div class="gallery-items-header">
+            <span>道具列表</span>
+          </div>
+          <div class="items-list" id="itemsList">
+            <!-- 动态生成 -->
+          </div>
+        </div>
+
+        <!-- 右侧：道具详情 -->
+        <div class="gallery-detail" id="galleryDetail">
+          <div class="detail-placeholder">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <p>选择道具查看详情</p>
+          </div>
+          <div class="detail-content" id="itemDetailContent" style="display: none;">
+            <div class="detail-header">
+              <h3 class="item-name" id="detailItemName"></h3>
+              <span class="item-tier" id="detailItemTier"></span>
+            </div>
+            <div class="detail-section">
+              <h4><span class="material-symbols-outlined">category</span> 基本信息</h4>
+              <div class="detail-row">
+                <span class="detail-label">道具分类</span>
+                <span class="detail-value" id="detailCategory"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">适用职业</span>
+                <span class="detail-value" id="detailClass"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">是否可制作</span>
+                <span class="detail-value" id="detailCraftable"></span>
+              </div>
+            </div>
+            <div class="detail-section">
+              <h4><span class="material-symbols-outlined">auto_awesome</span> 道具属性</h4>
+              <div class="item-attrs" id="detailAttrs"></div>
+            </div>
+            <div class="detail-section">
+              <h4><span class="material-symbols-outlined">pin_drop</span> 掉落信息</h4>
+              <div class="detail-row">
+                <span class="detail-label">掉落来源</span>
+                <span class="detail-value" id="detailSource"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">所在地图</span>
+                <span class="detail-value" id="detailMap"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">刷新点位</span>
+                <span class="detail-value" id="detailLocation"></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">掉落概率</span>
+                <span class="detail-value" id="detailDropRate"></span>
+              </div>
+            </div>
+            <div class="detail-section" id="detailCraftSection" style="display: none;">
+              <h4><span class="material-symbols-outlined">construction</span> 制作材料</h4>
+              <div class="craft-materials" id="detailCraftMaterials"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 梦想数值 -->
+    <div class="page-container" id="page-dream-calc">
+      <section class="hero-section">
+        <div class="glow-effect glow-1"></div>
+        <h2 class="hero-title">数值计算</h2>
+        <p class="hero-subtitle">精准的角色数值分析，助你优化配装策略。</p>
+      </section>
+
+      <div class="calc-card">
+        <h3>夜刃 - Kael 属性分析</h3>
+        <div class="calc-row">
+          <span class="calc-label">攻击力</span>
+          <span class="calc-value">98</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 98%"></div>
+        </div>
+        
+        <div class="calc-row" style="margin-top: 16px;">
+          <span class="calc-label">防御力</span>
+          <span class="calc-value">45</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 45%"></div>
+        </div>
+        
+        <div class="calc-row" style="margin-top: 16px;">
+          <span class="calc-label">速度</span>
+          <span class="calc-value">92</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 92%"></div>
+        </div>
+        
+        <div class="calc-row" style="margin-top: 16px;">
+          <span class="calc-label">生命值</span>
+          <span class="calc-value">3200</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 65%"></div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <h3>流光 - Lyra 属性分析</h3>
+        <div class="calc-row">
+          <span class="calc-label">攻击力</span>
+          <span class="calc-value">52</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 52%"></div>
+        </div>
+        
+        <div class="calc-row" style="margin-top: 16px;">
+          <span class="calc-label">防御力</span>
+          <span class="calc-value">78</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 78%"></div>
+        </div>
+        
+        <div class="calc-row" style="margin-top: 16px;">
+          <span class="calc-label">治疗量</span>
+          <span class="calc-value">95</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 95%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 梦想计时器 -->
+    <div class="page-container" id="page-dream-timer">
+      <section class="hero-section">
+        <div class="glow-effect glow-1"></div>
+        <h2 class="hero-title">计时器</h2>
+        <p class="hero-subtitle">追踪重要活动时间，不再错过任何奖励。</p>
+      </section>
+
+      <div class="timer-card">
+        <div class="timer-info">
+          <h4>每日签到</h4>
+          <p>每日凌晨重置</p>
+        </div>
+        <div class="timer-countdown" id="timer-signin">--:--:--</div>
+      </div>
+
+      <div class="timer-card">
+        <div class="timer-info">
+          <h4>体力恢复</h4>
+          <p>每 6 分钟恢复 1 点</p>
+        </div>
+        <div class="timer-countdown" id="timer-stamina">--:--</div>
+      </div>
+
+      <div class="timer-card">
+        <div class="timer-info">
+          <h4>周常副本</h4>
+          <p>每周一凌晨重置</p>
+        </div>
+        <div class="timer-countdown" id="timer-weekly">--天 --:--:--</div>
+      </div>
+
+      <div class="timer-card">
+        <div class="timer-info">
+          <h4>限时活动</h4>
+          <p>剩余时间</p>
+        </div>
+        <div class="timer-countdown urgent" id="timer-event">02:34:15</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- 角色详情弹窗 -->
+<div class="character-detail-modal" id="characterDetailModal">
+  <div class="character-detail-content">
+    <div class="character-detail-header">
+      <img class="character-detail-img" src="" alt="">
+      <div class="character-detail-info">
+        <h3></h3>
+        <span class="role-tag"></span>
+      </div>
+    </div>
+    <div class="character-detail-stats">
+      <div class="detail-stat">
+        <span class="detail-stat-value">0</span>
+        <span class="detail-stat-label">攻击力</span>
+      </div>
+      <div class="detail-stat">
+        <span class="detail-stat-value">0</span>
+        <span class="detail-stat-label">防御力</span>
+      </div>
+      <div class="detail-stat">
+        <span class="detail-stat-value">0</span>
+        <span class="detail-stat-label">速度</span>
+      </div>
+    </div>
+    <p class="character-detail-desc"></p>
+    <button class="character-detail-close" id="closeDetailModal">关闭</button>
+  </div>
+</div>
+
+<script src="components.js"></script>
+<script src="main.js"></script>
+<script>
+  Components.init({ currentPage: 'dream', theme: 'dream' });
+</script>
+
+</body>
+</html>
