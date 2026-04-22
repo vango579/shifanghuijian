@@ -31,7 +31,10 @@
 <!-- 侧边栏 -->
 <aside class="sidebar">
   <div class="sidebar-header">
-    <img src="icon/logo.png" alt="十方汇鉴" class="sidebar-logo">
+    <div class="sidebar-logos">
+      <img src="icon/logo1.png" alt="十方汇鉴" class="sidebar-logo-main">
+      <img src="icon/zw-logo.png" alt="征途" class="sidebar-logo-secondary">
+    </div>
     <span class="sidebar-title">十方汇鉴</span>
   </div>
   
@@ -41,7 +44,7 @@
       <span class="nav-text">首页</span>
     </a>
     <a class="nav-btn active" data-page="dream" href="dreams.html">
-      <i class="fas fa-rocket"></i>
+      <img src="icon/mxyzc.png" alt="梦想与征程" class="nav-icon-img">
       <span class="nav-text">梦想与征程</span>
     </a>
   </nav>
@@ -170,10 +173,12 @@
             <h4 class="filter-title">品阶筛选</h4>
             <div class="filter-buttons" id="filter-tier">
               <button class="filter-btn active" data-value="全部">全部</button>
-              <button class="filter-btn" data-value="普通">普通</button>
-              <button class="filter-btn" data-value="稀有">稀有</button>
-              <button class="filter-btn" data-value="英雄">英雄</button>
-              <button class="filter-btn" data-value="传说">传说</button>
+              <button class="filter-btn" data-value="普通(白)">普通(白)</button>
+              <button class="filter-btn" data-value="优秀(绿)">优秀(绿)</button>
+              <button class="filter-btn" data-value="精良(蓝)">精良(蓝)</button>
+              <button class="filter-btn" data-value="英雄(红)">英雄(红)</button>
+              <button class="filter-btn" data-value="传说(紫)">传说(紫)</button>
+              <button class="filter-btn" data-value="神话(金)">神话(金)</button>
             </div>
 
             <h4 class="filter-title">道具分类</h4>
@@ -181,17 +186,38 @@
               <button class="filter-btn active" data-value="全部">全部</button>
               <button class="filter-btn" data-value="武器">武器</button>
               <button class="filter-btn" data-value="防具">防具</button>
-              <button class="filter-btn" data-value="材料">材料</button>
+              <button class="filter-btn" data-value="饰品">饰品</button>
+              <button class="filter-btn" data-value="技能书">技能书</button>
+              <button class="filter-btn" data-value="消耗品">消耗品</button>
+              <button class="filter-btn" data-value="其他">其他</button>
+            </div>
+
+            <h4 class="filter-title">装备部位</h4>
+            <div class="filter-buttons" id="filter-subcategory">
+              <button class="filter-btn active" data-value="全部">全部</button>
+              <button class="filter-btn" data-value="魔杖/法杖">魔杖/法杖</button>
+              <button class="filter-btn" data-value="单手剑/单手棍">单手剑/单手棍</button>
+              <button class="filter-btn" data-value="双手剑/长矛">双手剑/长矛</button>
+              <button class="filter-btn" data-value="弓/十字弓">弓/十字弓</button>
+              <button class="filter-btn" data-value="臂甲/法书">臂甲/法书</button>
+              <button class="filter-btn" data-value="内衣/T恤">内衣/T恤</button>
+              <button class="filter-btn" data-value="腰带">腰带</button>
+              <button class="filter-btn" data-value="戒指">戒指</button>
             </div>
 
             <h4 class="filter-title">适用职业</h4>
             <div class="filter-buttons" id="filter-class">
               <button class="filter-btn active" data-value="全部">全部</button>
-              <button class="filter-btn" data-value="突击型">突击型</button>
-              <button class="filter-btn" data-value="支援型">支援型</button>
-              <button class="filter-btn" data-value="防御型">防御型</button>
-              <button class="filter-btn" data-value="特工型">特工型</button>
               <button class="filter-btn" data-value="全职业">全职业</button>
+              <button class="filter-btn" data-value="法师">法师</button>
+              <button class="filter-btn" data-value="骑士">骑士</button>
+              <button class="filter-btn" data-value="精灵">精灵</button>
+              <button class="filter-btn" data-value="黑暗精灵">黑暗精灵</button>
+              <button class="filter-btn" data-value="黑妖">黑妖</button>
+              <button class="filter-btn" data-value="王族">王族</button>
+              <button class="filter-btn" data-value="领主">领主</button>
+              <button class="filter-btn" data-value="魔斗士">魔斗士</button>
+              <button class="filter-btn" data-value="野蛮人">野蛮人</button>
             </div>
           </div>
 
@@ -228,6 +254,10 @@
                 <span class="detail-label">道具分类</span>
                 <span class="detail-value" id="detailCategory"></span>
               </div>
+              <div class="detail-row" id="detailSubCategoryRow" style="display: none;">
+                <span class="detail-label">装备部位</span>
+                <span class="detail-value" id="detailSubCategory"></span>
+              </div>
               <div class="detail-row">
                 <span class="detail-label">适用职业</span>
                 <span class="detail-value" id="detailClass"></span>
@@ -250,14 +280,6 @@
               <div class="detail-row">
                 <span class="detail-label">所在地图</span>
                 <span class="detail-value" id="detailMap"></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">刷新点位</span>
-                <span class="detail-value" id="detailLocation"></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">掉落概率</span>
-                <span class="detail-value" id="detailDropRate"></span>
               </div>
             </div>
             <div class="detail-section" id="detailCraftSection" style="display: none;">

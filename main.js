@@ -459,6 +459,7 @@ const ItemGallery = {
   filters: {
     tier: '全部',
     category: '全部',
+    subcategory: '全部',
     class: '全部'
   },
   searchQuery: '',
@@ -495,14 +496,47 @@ const ItemGallery = {
           if (file.name.endsWith('.json')) {
             try {
               const jsonData = JSON.parse(content);
-              this.items = jsonData.items || jsonData || [];
-              console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具`);
+              const rawItems = jsonData.items || jsonData || [];
+              // 字段名映射：将JSON中的中文字段名映射到代码中使用的英文字段名
+              let mappedItems = rawItems.map(item => ({
+                name: item["道具"],
+                id: item["道具ID"],
+                tier: item["品阶"],
+                category: item["道具分类"],
+                jobClass: item["适用职业"],
+                source: item["掉落来源(怪物)"],
+                map: item["地图"],
+                attrs: item["道具属性"],
+                craftMaterials: item["制作材料"],
+                craftable: item["制作材料"] ? "是" : "否"
+              }));
+              // 去重处理：根据道具名称去重
+              const uniqueItems = [];
+              const itemNames = new Set();
+              mappedItems.forEach(item => {
+                if (!itemNames.has(item.name)) {
+                  itemNames.add(item.name);
+                  uniqueItems.push(item);
+                }
+              });
+              this.items = uniqueItems;
+              console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具（去重后）`);
             } catch (jsonError) {
               console.error('[ItemGallery] JSON解析失败:', jsonError);
               alert('JSON文件格式错误，请检查文件内容');
             }
           } else if (file.name.endsWith('.csv')) {
-            this.items = this.parseCSV(content);
+            let csvItems = this.parseCSV(content);
+            // 去重处理：根据道具名称去重
+            const uniqueItems = [];
+            const itemNames = new Set();
+            csvItems.forEach(item => {
+              if (!itemNames.has(item.name)) {
+                itemNames.add(item.name);
+                uniqueItems.push(item);
+              }
+            });
+            this.items = uniqueItems;
           }
           this.filteredItems = [...this.items];
           this.updateItemCount();
@@ -525,15 +559,39 @@ const ItemGallery = {
 
   async loadCSVData() {
     try {
-      // 优先尝试加载 JSON 格式（推荐）
-      const jsonPath = 'item/mxyzc/掉落表.json';
+      // 加载 item_data.json 格式数据
+      const jsonPath = 'item/mxyzc/item_data.json';
       const jsonUrl = new URL(jsonPath, window.location.href);
       const jsonResponse = await fetch(jsonUrl);
 
       if (jsonResponse.ok) {
         const jsonData = await jsonResponse.json();
-        this.items = jsonData.items || jsonData || [];
-        console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具`);
+        const rawItems = jsonData.items || jsonData || [];
+        // 字段名映射：将JSON中的中文字段名映射到代码中使用的英文字段名
+        let mappedItems = rawItems.map(item => ({
+          name: item["道具"],
+          id: item["道具ID"],
+          tier: item["道具品阶"],
+          category: item["道具分类"],
+          subCategory: item["装备部位"] || "",
+          jobClass: item["道具职业适用"],
+          source: item["道具来源(怪物)"],
+          map: item["地图"],
+          attrs: item["道具属性"] || "",
+          craftMaterials: item["制作所需材料"] || "",
+          craftable: item["是否可制作"] === '是' ? '是' : '否'
+        }));
+        // 去重处理：根据道具名称去重
+        const uniqueItems = [];
+        const itemNames = new Set();
+        mappedItems.forEach(item => {
+          if (!itemNames.has(item.name)) {
+            itemNames.add(item.name);
+            uniqueItems.push(item);
+          }
+        });
+        this.items = uniqueItems;
+        console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具（去重后）`);
       } else {
         // 回退到 CSV 格式
         console.log('[ItemGallery] JSON 文件不存在，尝试加载 CSV...');
@@ -544,7 +602,17 @@ const ItemGallery = {
           throw new Error(`文件请求失败: ${csvResponse.status}`);
         }
         const csvText = await csvResponse.text();
-        this.items = this.parseCSV(csvText);
+        let csvItems = this.parseCSV(csvText);
+        // 去重处理：根据道具名称去重
+        const uniqueItems = [];
+        const itemNames = new Set();
+        csvItems.forEach(item => {
+          if (!itemNames.has(item.name)) {
+            itemNames.add(item.name);
+            uniqueItems.push(item);
+          }
+        });
+        this.items = uniqueItems;
       }
 
       this.filteredItems = [...this.items];
@@ -797,7 +865,7 @@ const ItemGallery = {
       });
     });
 
-    this.filters = { tier: '全部', category: '全部', class: '全部' };
+    this.filters = { tier: '全部', category: '全部', subcategory: '全部', class: '全部' };
     this.applyFilters();
   },
 
@@ -810,16 +878,25 @@ const ItemGallery = {
         return false;
       }
       // 品阶筛选
-      if (this.filters.tier !== '全部' && item.tier !== this.filters.tier) {
+      if (this.filters.tier !== '全部' && !item.tier.includes(this.filters.tier)) {
         return false;
       }
       // 分类筛选
       if (this.filters.category !== '全部' && !item.category.includes(this.filters.category)) {
         return false;
       }
-      // 职业筛选
-      if (this.filters.class !== '全部' && item.jobClass !== this.filters.class) {
+      // 二级分类筛选
+      if (this.filters.subcategory !== '全部' && (!item.subCategory || !item.subCategory.includes(this.filters.subcategory))) {
         return false;
+      }
+      // 职业筛选（支持多职业）
+      if (this.filters.class !== '全部') {
+        const selectedClass = this.filters.class;
+        // 检查职业是否包含在道具的适用职业中
+        const jobClasses = item.jobClass.split(/[\/\s,]+/).filter(c => c);
+        if (!jobClasses.some(job => selectedClass.includes(job) || job.includes(selectedClass))) {
+          return false;
+        }
       }
       return true;
     });
@@ -906,10 +983,12 @@ const ItemGallery = {
 
   getTierClass(tier) {
     const tierMap = {
-      '普通': 'tier-common',
-      '稀有': 'tier-rare',
-      '英雄': 'tier-hero',
-      '传说': 'tier-legend'
+      '普通(白)': 'tier-common',
+      '优秀(绿)': 'tier-rare',
+      '精良(蓝)': 'tier-uncommon',
+      '英雄(红)': 'tier-hero',
+      '传说(紫)': 'tier-legend',
+      '神话(金)': 'tier-mythic'
     };
     return tierMap[tier] || 'tier-common';
   },
@@ -946,7 +1025,7 @@ const ItemGallery = {
         </div>
         <div class="item-info">
           <h4>${item.name}</h4>
-          <p>${item.map || '未知地图'}</p>
+          <p>${item.category || '未知分类'}</p>
         </div>
         <span class="item-tier-badge ${this.getTierClass(item.tier)}">${item.tier}</span>
       </div>
@@ -994,12 +1073,21 @@ const ItemGallery = {
     tierEl.className = `item-tier ${this.getTierClass(item.tier)}`;
 
     document.getElementById('detailCategory').textContent = item.category;
+    
+    // 显示装备部位
+    const subCategoryRow = document.getElementById('detailSubCategoryRow');
+    const subCategoryEl = document.getElementById('detailSubCategory');
+    if (item.subCategory && item.subCategory.trim()) {
+      subCategoryEl.textContent = item.subCategory;
+      subCategoryRow.style.display = 'flex';
+    } else {
+      subCategoryRow.style.display = 'none';
+    }
+    
     document.getElementById('detailClass').textContent = item.jobClass;
     document.getElementById('detailCraftable').textContent = item.craftable === '是' ? '可制作' : '不可制作';
     document.getElementById('detailSource').textContent = item.source;
     document.getElementById('detailMap').textContent = item.map;
-    document.getElementById('detailLocation').textContent = item.location || '刷新点位待定';
-    document.getElementById('detailDropRate').textContent = item.dropRate || '数据待定';
 
     const attrsContainer = document.getElementById('detailAttrs');
     if (item.attributes && item.attributes !== '无属性' && item.attributes.trim()) {
