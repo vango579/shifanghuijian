@@ -466,7 +466,7 @@ const ItemGallery = {
         throw new Error('当前通过 file:// 打开页面，浏览器会阻止读取本地 CSV。请用本地 HTTP 服务打开（例如 VSCode Live Server）。');
       }
 
-      const csvPath = 'item/mxyzc/终极掉落百科表_带职业限制与刷新点位及属性_20260417_183805.csv';
+      const csvPath = 'item/mxyzc/掉落表.csv';
       const csvUrl = new URL(csvPath, window.location.href);
       const response = await fetch(csvUrl);
       if (!response.ok) {

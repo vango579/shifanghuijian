@@ -319,6 +319,136 @@ sfhj/
 | Google Fonts - Noto Sans SC | - | `https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700` |
 | Material Symbols Outlined | - | `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght@20..48,100..700` |
 
+---
+
+## 浏览器缓存管理方案
+
+本项目实现了多层级缓存管理策略，确保用户始终能看到最新内容。
+
+### 方案一：Meta 缓存控制（基础）
+
+在 HTML 头部添加缓存控制 Meta 标签：
+
+```html
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+```
+
+**效果**：告知浏览器不缓存当前页面（但部分浏览器会忽略）
+
+---
+
+### 方案二：版本号策略（推荐）
+
+使用 `cache-buster.js` 自动为资源添加版本号参数：
+
+#### 工作原理
+
+```javascript
+// 原始 URL
+/styles.css
+
+// 自动转换为（添加 ?v=20260422.1755）
+/styles.css?v=20260422.1755
+```
+
+#### 使用方法
+
+1. **在资源标签上添加 `data-version` 属性：**
+
+```html
+<link rel="stylesheet" href="styles.css" data-version>
+<script src="main.js" data-version></script>
+```
+
+2. **修改版本号强制刷新：**
+
+打开 `cache-buster.js`，修改 VERSION 值：
+
+```javascript
+const CacheBuster = {
+  VERSION: '20260423.1000',  // 修改此值即可强制刷新
+  // ...
+};
+```
+
+#### 自动更新规则
+
+版本号格式建议：`YYYYMMDD.HHmm`
+
+- 每次发布新版本时更新
+- 或者使用构建工具自动生成（如 Webpack 的 `[contenthash]`）
+
+---
+
+### 方案三：Service Worker（生产环境推荐）
+
+使用 `sw.js` 和 `sw-manager.js` 实现专业级缓存管理：
+
+#### 功能特性
+
+| 功能 | 说明 |
+|------|------|
+| 缓存优先 | 静态资源优先使用缓存，提升加载速度 |
+| 网络优先 | HTML 页面始终获取最新内容 |
+| 自动更新 | 检测到新版本时提示用户 |
+| 缓存管理 | 自动清理旧版本缓存 |
+
+#### 缓存策略
+
+| 资源类型 | 策略 | 说明 |
+|----------|------|------|
+| HTML 页面 | 网络优先 | 确保获取最新页面内容 |
+| JS/CSS | 缓存优先 | 提升性能，同时后台更新 |
+| 图片 | 缓存优先 | 减少重复请求 |
+
+#### 更新流程
+
+1. 用户首次访问 → 缓存所有资源
+2. 用户再次访问 → 快速加载（缓存）
+3. 网站更新 → Service Worker 检测到变化
+4. 用户看到提示 → 点击"立即更新"按钮
+5. 页面自动刷新 → 获取最新版本
+
+#### 手动清除缓存
+
+在浏览器控制台执行：
+
+```javascript
+// 清除所有缓存并刷新
+SWManager.clearAllCache();
+```
+
+#### 获取缓存信息
+
+```javascript
+// 查看当前缓存列表
+SWManager.getCacheInfo();
+```
+
+---
+
+### 快速开始
+
+所有方案默认已启用，无需额外配置。
+
+如需强制刷新：
+1. 修改 `cache-buster.js` 中的 `VERSION` 值
+2. 或在控制台执行 `SWManager.clearAllCache()`
+
+---
+
+### 文件清单
+
+| 文件 | 用途 |
+|------|------|
+| `cache-buster.js` | 版本号自动注入工具 |
+| `sw.js` | Service Worker 核心逻辑 |
+| `sw-manager.js` | Service Worker 注册与管理 |
+
+---
+
 ## 开发
 
 所有页面通过 `Components.init()` 初始化侧边栏，通过 `main.js` 处理交互逻辑。
