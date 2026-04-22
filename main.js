@@ -461,40 +461,73 @@ const ItemGallery = {
 
   async loadCSVData() {
     try {
-      const response = await fetch('item/mxyzc/终极掉落百科表_带职业限制与刷新点位及属性_20260417_183805.csv');
+      // 直接用 file:// 打开页面时，浏览器通常会禁止 fetch 读取本地文件
+      if (window.location.protocol === 'file:') {
+        throw new Error('当前通过 file:// 打开页面，浏览器会阻止读取本地 CSV。请用本地 HTTP 服务打开（例如 VSCode Live Server）。');
+      }
+
+      const csvPath = 'item/mxyzc/终极掉落百科表_带职业限制与刷新点位及属性_20260417_183805.csv';
+      const csvUrl = new URL(csvPath, window.location.href);
+      const response = await fetch(csvUrl);
+      if (!response.ok) {
+        throw new Error(`CSV 请求失败: ${response.status} ${response.statusText}`);
+      }
       const csvText = await response.text();
       this.items = this.parseCSV(csvText);
       this.filteredItems = [...this.items];
-      document.getElementById('itemCount').textContent = this.items.length;
+      const itemCount = document.getElementById('itemCount');
+      if (itemCount) itemCount.textContent = this.items.length;
     } catch (error) {
       console.error('加载道具数据失败:', error);
     }
   },
 
   parseCSV(csvText) {
-    const lines = csvText.split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
+    const normalized = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalized.split('\n').filter(l => l !== '');
+    if (lines.length === 0) return [];
+
+    // 解析 CSV 行，支持引号字段与 "" 转义
+    const parseLine = (line) => {
+      const out = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+
+        if (ch === '"') {
+          // 处理 "" 作为转义的双引号
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+            continue;
+          }
+          inQuotes = !inQuotes;
+          continue;
+        }
+
+        if (ch === ',' && !inQuotes) {
+          out.push(current.trim());
+          current = '';
+          continue;
+        }
+
+        current += ch;
+      }
+
+      out.push(current.trim());
+      return out;
+    };
+
+    const headers = parseLine(lines[0]).map(h => h.trim());
     const items = [];
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      let values = [];
-      let current = '';
-      let inQuotes = false;
-
-      for (let char of line) {
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          values.push(current.trim());
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      values.push(current.trim());
+      const values = parseLine(line);
 
       const item = {
         name: values[0] || '',
@@ -557,7 +590,8 @@ const ItemGallery = {
       return true;
     });
 
-    document.getElementById('itemCount').textContent = this.filteredItems.length;
+    const itemCount = document.getElementById('itemCount');
+    if (itemCount) itemCount.textContent = this.filteredItems.length;
     this.renderItems();
   },
 
@@ -571,21 +605,12 @@ const ItemGallery = {
     return tierMap[tier] || 'tier-common';
   },
 
-  getTierIcon(tier) {
-    const iconMap = {
-      '普通': 'hexagon',
-      '稀有': 'diamond',
-      '英雄': 'stars',
-      '传说': 'military_tech'
-    };
-    return iconMap[tier] || 'category';
-  },
-
   getCategoryIcon(category) {
-    if (category.includes('武器')) return 'sports_martial_arts';
-    if (category.includes('防具')) return 'shield';
-    if (category.includes('材料')) return 'category';
-    return 'inventory_2';
+    // 统一使用 Font Awesome 图标类名（fas）
+    if (category.includes('武器')) return 'fa-sword';
+    if (category.includes('防具')) return 'fa-shield';
+    if (category.includes('材料')) return 'fa-cubes';
+    return 'fa-box';
   },
 
   renderItems() {
@@ -600,7 +625,7 @@ const ItemGallery = {
     container.innerHTML = this.filteredItems.map((item, index) => `
       <div class="item-card ${this.selectedItem === index ? 'selected' : ''}" data-index="${index}">
         <div class="item-icon ${this.getTierClass(item.tier)}">
-          <span class="material-symbols-outlined">${this.getCategoryIcon(item.category)}</span>
+          <i class="fas ${this.getCategoryIcon(item.category)}" aria-hidden="true"></i>
         </div>
         <div class="item-info">
           <h4>${item.name}</h4>

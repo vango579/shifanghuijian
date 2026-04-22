@@ -48,16 +48,48 @@ const Components = {
     const toggleBtn = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
+    const navBtns = document.querySelectorAll('.sidebar .nav-btn');
     
     if (toggleBtn && sidebar && mainContent) {
+      const syncToggleLabel = () => {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        const textEl = toggleBtn.querySelector('.toggle-text');
+        const label = isCollapsed ? '展开侧边栏' : '收起侧边栏';
+        toggleBtn.setAttribute('aria-label', label);
+        if (textEl) textEl.textContent = label;
+      };
+
+      const syncNavTooltips = () => {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        navBtns.forEach(btn => {
+          const text = btn.querySelector('.nav-text')?.textContent?.trim();
+          if (!text) return;
+          if (isCollapsed) {
+            btn.setAttribute('title', text);
+            btn.setAttribute('aria-label', text);
+          } else {
+            btn.removeAttribute('title');
+            btn.removeAttribute('aria-label');
+          }
+        });
+      };
+
       // 从 localStorage 恢复侧边栏状态
       const savedState = localStorage.getItem('sidebarCollapsed');
       if (savedState === 'true') {
         sidebar.classList.add('collapsed');
         mainContent.style.marginLeft = '72px';
       }
+      syncToggleLabel();
+      syncNavTooltips();
+
+      // 预折叠样式只用于首屏防闪，初始化后必须移除，避免影响展开态显示
+      document.documentElement.classList.remove('sidebar-precollapsed');
       
       toggleBtn.addEventListener('click', () => {
+        // 用户交互后不再需要预折叠样式
+        document.documentElement.classList.remove('sidebar-precollapsed');
+
         sidebar.classList.toggle('collapsed');
         
         if (sidebar.classList.contains('collapsed')) {
@@ -67,6 +99,8 @@ const Components = {
           mainContent.style.marginLeft = '220px';
           localStorage.setItem('sidebarCollapsed', 'false');
         }
+        syncToggleLabel();
+        syncNavTooltips();
       });
     }
   }

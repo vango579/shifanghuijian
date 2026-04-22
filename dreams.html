@@ -7,6 +7,20 @@
 <link rel="icon" type="image/png" href="icon/app_icon_round.png">
 <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght@20..48,100..700&display=swap" rel="stylesheet">
+<script>
+  // 首次访问默认展开；之后才持久化用户折叠选择
+  try {
+    if (!localStorage.getItem('sidebarVisited')) {
+      localStorage.setItem('sidebarVisited', 'true');
+      localStorage.setItem('sidebarCollapsed', 'false');
+    }
+
+    // 预先应用侧边栏折叠状态，避免页面跳转时“闪一下”
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+      document.documentElement.classList.add('sidebar-precollapsed');
+    }
+  } catch (e) {}
+</script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-dream">
@@ -16,9 +30,6 @@
   <div class="sidebar-header">
     <img src="icon/logo.png" alt="十方汇鉴" class="sidebar-logo">
     <span class="sidebar-title">十方汇鉴</span>
-    <button class="sidebar-toggle" id="sidebarToggle">
-      <i class="fas fa-chevron-left"></i>
-    </button>
   </div>
   
   <nav class="sidebar-nav">
@@ -31,6 +42,13 @@
       <span class="nav-text">梦想与征程</span>
     </a>
   </nav>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="折叠/展开侧边栏">
+      <i class="fas fa-chevron-left" aria-hidden="true"></i>
+      <span class="toggle-text">收起侧边栏</span>
+    </button>
+  </div>
 </aside>
 
 <!-- 主内容区 -->
@@ -193,7 +211,7 @@
         <!-- 右侧：道具详情 -->
         <div class="gallery-detail" id="galleryDetail">
           <div class="detail-placeholder">
-            <span class="material-symbols-outlined">inventory_2</span>
+            <i class="fas fa-box-open" aria-hidden="true"></i>
             <p>选择道具查看详情</p>
           </div>
           <div class="detail-content" id="itemDetailContent" style="display: none;">
@@ -202,7 +220,7 @@
               <span class="item-tier" id="detailItemTier"></span>
             </div>
             <div class="detail-section">
-              <h4><span class="material-symbols-outlined">category</span> 基本信息</h4>
+              <h4><i class="fas fa-tags" aria-hidden="true"></i> 基本信息</h4>
               <div class="detail-row">
                 <span class="detail-label">道具分类</span>
                 <span class="detail-value" id="detailCategory"></span>
@@ -217,11 +235,11 @@
               </div>
             </div>
             <div class="detail-section">
-              <h4><span class="material-symbols-outlined">auto_awesome</span> 道具属性</h4>
+              <h4><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> 道具属性</h4>
               <div class="item-attrs" id="detailAttrs"></div>
             </div>
             <div class="detail-section">
-              <h4><span class="material-symbols-outlined">pin_drop</span> 掉落信息</h4>
+              <h4><i class="fas fa-location-dot" aria-hidden="true"></i> 掉落信息</h4>
               <div class="detail-row">
                 <span class="detail-label">掉落来源</span>
                 <span class="detail-value" id="detailSource"></span>
@@ -240,7 +258,7 @@
               </div>
             </div>
             <div class="detail-section" id="detailCraftSection" style="display: none;">
-              <h4><span class="material-symbols-outlined">construction</span> 制作材料</h4>
+              <h4><i class="fas fa-hammer" aria-hidden="true"></i> 制作材料</h4>
               <div class="craft-materials" id="detailCraftMaterials"></div>
             </div>
           </div>
