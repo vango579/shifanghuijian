@@ -305,6 +305,8 @@ const PageNavigation = {
   }
 };
 
+
+
 /**
  * 计时器模块
  */
@@ -439,6 +441,15 @@ document.addEventListener('DOMContentLoaded', () => {
   App.init({ page: initialPage });
 });
 
+// 将ItemGallery暴露给全局
+try {
+  if (typeof window !== 'undefined') {
+    window.ItemGallery = ItemGallery;
+  }
+} catch (e) {
+  console.warn('无法暴露ItemGallery到全局:', e);
+}
+
 /**
  * 道具图鉴模块
  */
@@ -452,42 +463,130 @@ const ItemGallery = {
   },
   searchQuery: '',
   selectedItem: null,
+  searchDebounceTimer: null, // 搜索防抖定时器
+  keyboardNavigationIndex: -1, // 键盘导航索引
 
   async init() {
+    this.initFileInput();
     await this.loadCSVData();
     this.bindEvents();
+    this.updateFilterStats();
     this.renderItems();
+  },
+
+  initFileInput() {
+    // 创建文件选择输入
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json,.csv';
+    fileInput.id = 'itemFileInput';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    // 绑定文件选择事件
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          if (file.name.endsWith('.json')) {
+            try {
+              const jsonData = JSON.parse(content);
+              this.items = jsonData.items || jsonData || [];
+              console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具`);
+            } catch (jsonError) {
+              console.error('[ItemGallery] JSON解析失败:', jsonError);
+              alert('JSON文件格式错误，请检查文件内容');
+            }
+          } else if (file.name.endsWith('.csv')) {
+            this.items = this.parseCSV(content);
+          }
+          this.filteredItems = [...this.items];
+          this.updateItemCount();
+          this.renderItems();
+        };
+        reader.readAsText(file);
+      } catch (error) {
+        console.error('[ItemGallery] 读取文件失败:', error);
+        alert('文件读取失败，请重试');
+      }
+    });
+  },
+
+  selectFile() {
+    const fileInput = document.getElementById('itemFileInput');
+    if (fileInput) {
+      fileInput.click();
+    }
   },
 
   async loadCSVData() {
     try {
-      // 直接用 file:// 打开页面时，浏览器通常会禁止 fetch 读取本地文件
-      if (window.location.protocol === 'file:') {
-        throw new Error('当前通过 file:// 打开页面，浏览器会阻止读取本地 CSV。请用本地 HTTP 服务打开（例如 VSCode Live Server）。');
+      // 优先尝试加载 JSON 格式（推荐）
+      const jsonPath = 'item/mxyzc/掉落表.json';
+      const jsonUrl = new URL(jsonPath, window.location.href);
+      const jsonResponse = await fetch(jsonUrl);
+
+      if (jsonResponse.ok) {
+        const jsonData = await jsonResponse.json();
+        this.items = jsonData.items || jsonData || [];
+        console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具`);
+      } else {
+        // 回退到 CSV 格式
+        console.log('[ItemGallery] JSON 文件不存在，尝试加载 CSV...');
+        const csvPath = 'item/mxyzc/掉落表.csv';
+        const csvUrl = new URL(csvPath, window.location.href);
+        const csvResponse = await fetch(csvUrl);
+        if (!csvResponse.ok) {
+          throw new Error(`文件请求失败: ${csvResponse.status}`);
+        }
+        const csvText = await csvResponse.text();
+        this.items = this.parseCSV(csvText);
       }
 
-      const csvPath = 'item/mxyzc/掉落表.csv';
-      const csvUrl = new URL(csvPath, window.location.href);
-      const response = await fetch(csvUrl);
-      if (!response.ok) {
-        throw new Error(`CSV 请求失败: ${response.status} ${response.statusText}`);
-      }
-      const csvText = await response.text();
-      this.items = this.parseCSV(csvText);
       this.filteredItems = [...this.items];
-      const itemCount = document.getElementById('itemCount');
-      if (itemCount) itemCount.textContent = this.items.length;
+      this.updateItemCount();
     } catch (error) {
-      console.error('加载道具数据失败:', error);
+      console.error('[ItemGallery] 加载道具数据失败:', error);
+      // 显示友好错误提示
+      const container = document.getElementById('itemsList');
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>数据加载失败</p>
+            <small>${error.message}</small>
+            <button class="file-select-btn" onclick="itemGallery.selectFile()">
+              <i class="fas fa-file-upload"></i>
+              选择文件
+            </button>
+          </div>
+        `;
+      }
     }
   },
 
+  /**
+   * 解析 CSV - 自动检测分隔符（Tab 或逗号）
+   * 忽略：道具ID、道具英文名称、怪物ID、怪物英文名称
+   */
   parseCSV(csvText) {
     const normalized = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalized.split('\n').filter(l => l !== '');
     if (lines.length === 0) return [];
 
-    // 解析 CSV 行，支持引号字段与 "" 转义
+    // 自动检测分隔符：计算第一行中 Tab 和逗号的数量
+    const firstLine = lines[0];
+    const tabCount = (firstLine.match(/\t/g) || []).length;
+    const commaCount = (firstLine.match(/,/g) || []).length;
+    const separator = tabCount >= commaCount ? '\t' : ',';
+
+    console.log(`[ItemGallery] 检测到分隔符: ${separator === '\t' ? 'Tab' : '逗号'}`);
+
+    // 解析行
     const parseLine = (line) => {
       const out = [];
       let current = '';
@@ -497,7 +596,6 @@ const ItemGallery = {
         const ch = line[i];
 
         if (ch === '"') {
-          // 处理 "" 作为转义的双引号
           if (inQuotes && line[i + 1] === '"') {
             current += '"';
             i++;
@@ -507,7 +605,7 @@ const ItemGallery = {
           continue;
         }
 
-        if (ch === ',' && !inQuotes) {
+        if (ch === separator && !inQuotes) {
           out.push(current.trim());
           current = '';
           continue;
@@ -520,7 +618,6 @@ const ItemGallery = {
       return out;
     };
 
-    const headers = parseLine(lines[0]).map(h => h.trim());
     const items = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -529,40 +626,113 @@ const ItemGallery = {
 
       const values = parseLine(line);
 
+      // 根据分隔符确定字段位置
+      // Tab 分隔时：0-道具, 1-ID, 2-英文名, 3-品阶, 4-分类, 5-职业, 6-怪物, 7-怪物ID, 8-怪物英文, 9-地图, 10-属性, 11-材料
+      // 逗号分隔时：同样顺序
+      let name, tier, category, jobClass, source, map, attributes, craftMaterials;
+
+      if (separator === '\t') {
+        // Tab 分隔
+        name = values[0] || '';
+        tier = values[3] || '';
+        category = values[4] || '';
+        jobClass = values[5] || '';
+        source = values[6] || '';
+        map = values[9] || '';
+        attributes = values[10] || '';
+        craftMaterials = values[11] || '';
+      } else {
+        // 逗号分隔
+        name = values[0] || '';
+        tier = values[3] || '';
+        category = values[4] || '';
+        jobClass = values[5] || '';
+        source = values[6] || '';
+        map = values[9] || '';
+        attributes = values[10] || '';
+        craftMaterials = values[11] || '';
+      }
+
+      // 清理字段 - 移除换行、回车等特殊字符
+      const clean = (str) => String(str || '').replace(/[\n\r\t]/g, '').trim();
+
+      // 跳过无效数据（道具名为空或全英文）
+      if (!name || /^[A-Za-z0-9_]+$/.test(name)) {
+        continue;
+      }
+
       const item = {
-        name: values[0] || '',
-        tier: values[1] || '',
-        category: values[2] || '',
-        jobClass: values[3] || '',
-        source: values[4] || '',
-        map: values[5] || '',
-        location: values[6] || '',
-        attributes: values[7] || '',
-        dropRate: values[8] || '',
-        craftable: values[9] || '',
-        craftMaterials: values[10] || ''
+        name: clean(name),
+        tier: clean(tier),
+        category: clean(category),
+        jobClass: clean(jobClass),
+        source: clean(source),
+        map: clean(map),
+        attributes: clean(attributes),
+        craftMaterials: clean(craftMaterials),
+        craftable: craftMaterials ? '是' : '否'
       };
 
       items.push(item);
     }
 
+    console.log(`[ItemGallery] 成功解析 ${items.length} 个道具`);
     return items;
   },
 
   bindEvents() {
+    // 搜索框 - 带防抖优化
     const searchInput = document.getElementById('gallerySearchInput');
     if (searchInput) {
+      // 输入事件（防抖 200ms）
       searchInput.addEventListener('input', (e) => {
-        this.searchQuery = e.target.value;
-        this.applyFilters();
+        clearTimeout(this.searchDebounceTimer);
+        this.searchDebounceTimer = setTimeout(() => {
+          this.searchQuery = e.target.value.trim();
+          this.applyFilters();
+        }, 200);
+      });
+
+      // 回车键：直接定位到第一个结果
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          clearTimeout(this.searchDebounceTimer);
+          this.searchQuery = e.target.value.trim();
+          this.applyFilters();
+          if (this.filteredItems.length > 0) {
+            this.selectItem(0);
+            this.scrollToSelected();
+          }
+        }
+        // Escape：清空搜索
+        if (e.key === 'Escape') {
+          searchInput.value = '';
+          this.searchQuery = '';
+          this.applyFilters();
+        }
+        // 上/下箭头：键盘导航
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          this.handleKeyboardNavigation(e.key === 'ArrowDown' ? 1 : -1);
+        }
+      });
+
+      // 聚焦时显示搜索提示
+      searchInput.addEventListener('focus', () => {
+        searchInput.placeholder = '输入道具名称后按 Enter 搜索...';
+      });
+      searchInput.addEventListener('blur', () => {
+        searchInput.placeholder = '搜索道具名称...';
       });
     }
 
+    // 筛选按钮组
     document.querySelectorAll('.filter-buttons').forEach(group => {
       group.addEventListener('click', (e) => {
         const btn = e.target.closest('.filter-btn');
         if (!btn) return;
 
+        // 更新激活状态
         group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
@@ -571,28 +741,167 @@ const ItemGallery = {
         this.applyFilters();
       });
     });
+
+    // 双击清空所有筛选
+    document.querySelector('.gallery-filters')?.addEventListener('dblclick', () => {
+      this.resetFilters();
+    });
+  },
+
+  /**
+   * 处理键盘导航
+   */
+  handleKeyboardNavigation(direction) {
+    if (this.filteredItems.length === 0) return;
+
+    this.keyboardNavigationIndex += direction;
+
+    // 边界处理
+    if (this.keyboardNavigationIndex < 0) {
+      this.keyboardNavigationIndex = 0;
+    }
+    if (this.keyboardNavigationIndex >= this.filteredItems.length) {
+      this.keyboardNavigationIndex = this.filteredItems.length - 1;
+    }
+
+    this.selectItem(this.keyboardNavigationIndex);
+    this.scrollToSelected();
+  },
+
+  /**
+   * 滚动到选中项
+   */
+  scrollToSelected() {
+    const container = document.getElementById('itemsList');
+    const selectedCard = container?.querySelector('.item-card.selected');
+    if (selectedCard) {
+      selectedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  },
+
+  /**
+   * 重置所有筛选
+   */
+  resetFilters() {
+    // 清空搜索
+    const searchInput = document.getElementById('gallerySearchInput');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    this.searchQuery = '';
+
+    // 重置筛选按钮
+    document.querySelectorAll('.filter-buttons').forEach(group => {
+      group.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === '全部');
+      });
+    });
+
+    this.filters = { tier: '全部', category: '全部', class: '全部' };
+    this.applyFilters();
   },
 
   applyFilters() {
+    const query = this.searchQuery.toLowerCase();
+
     this.filteredItems = this.items.filter(item => {
-      if (this.searchQuery && !item.name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
+      // 搜索匹配（支持中文）
+      if (query && !item.name.includes(query) && !item.source.includes(query) && !item.map.includes(query)) {
         return false;
       }
+      // 品阶筛选
       if (this.filters.tier !== '全部' && item.tier !== this.filters.tier) {
         return false;
       }
+      // 分类筛选
       if (this.filters.category !== '全部' && !item.category.includes(this.filters.category)) {
         return false;
       }
+      // 职业筛选
       if (this.filters.class !== '全部' && item.jobClass !== this.filters.class) {
         return false;
       }
       return true;
     });
 
-    const itemCount = document.getElementById('itemCount');
-    if (itemCount) itemCount.textContent = this.filteredItems.length;
+    // 重置键盘导航索引
+    this.keyboardNavigationIndex = -1;
+
+    this.updateItemCount();
+    this.updateFilterStats();
     this.renderItems();
+  },
+
+  /**
+   * 更新道具计数
+   */
+  updateItemCount() {
+    const itemCount = document.getElementById('itemCount');
+    if (itemCount) {
+      itemCount.textContent = this.filteredItems.length;
+    }
+  },
+
+  /**
+   * 更新筛选统计信息
+   */
+  updateFilterStats() {
+    const stats = document.querySelector('.gallery-stats');
+    if (!stats) return;
+
+    const counts = {
+      total: this.items.length,
+      filtered: this.filteredItems.length,
+      tiers: {},
+      categories: {},
+      classes: {}
+    };
+
+    // 转义 CSS 选择器特殊字符 - 完全重写
+    const escapeCSS = (str) => {
+      if (!str || typeof str !== 'string') return '';
+      // 只保留字母、数字、中文和常见符号
+      const cleaned = str.replace(/[^a-zA-Z0-9\u4e00-\u9fa5\/\\,+()（）【】「」『』\s-]/g, '').trim();
+      if (!cleaned) return '';
+      // 双重转义引号
+      return cleaned.replace(/"/g, '\\"');
+    };
+
+    // 统计各筛选条件的数量
+    this.items.forEach(item => {
+      const tier = item.tier;
+      const cat = item.category;
+      const cls = item.jobClass;
+      if (tier && tier.length > 0 && tier !== '品阶') counts.tiers[tier] = (counts.tiers[tier] || 0) + 1;
+      if (cat && cat.length > 0 && cat !== '道具分类') counts.categories[cat] = (counts.categories[cat] || 0) + 1;
+      if (cls && cls.length > 0 && cls !== '适用职业' && cls !== '职业') counts.classes[cls] = (counts.classes[cls] || 0) + 1;
+    });
+
+    // 更新筛选按钮显示数量
+    Object.entries(counts.tiers).forEach(([tier, count]) => {
+      const escaped = escapeCSS(tier);
+      if (!escaped) return;
+      const btn = document.querySelector(`#filter-tier [data-value="${escaped}"]`);
+      if (btn) btn.dataset.count = count;
+    });
+
+    Object.entries(counts.categories).forEach(([cat, count]) => {
+      const escaped = escapeCSS(cat);
+      if (!escaped) return;
+      const btn = document.querySelector(`#filter-category [data-value="${escaped}"]`);
+      if (btn) btn.dataset.count = count;
+    });
+
+    Object.entries(counts.classes).forEach(([cls, count]) => {
+      const escaped = escapeCSS(cls);
+      if (!escaped) return;
+      try {
+        const btn = document.querySelector(`#filter-class [data-value="${escaped}"]`);
+        if (btn) btn.dataset.count = count;
+      } catch (e) {
+        console.warn('[ItemGallery] 选择器错误:', escaped, e.message);
+      }
+    });
   },
 
   getTierClass(tier) {
@@ -606,7 +915,6 @@ const ItemGallery = {
   },
 
   getCategoryIcon(category) {
-    // 统一使用 Font Awesome 图标类名（fas）
     if (category.includes('武器')) return 'fa-sword';
     if (category.includes('防具')) return 'fa-shield';
     if (category.includes('材料')) return 'fa-cubes';
@@ -618,12 +926,21 @@ const ItemGallery = {
     if (!container) return;
 
     if (this.filteredItems.length === 0) {
-      container.innerHTML = '<div class="empty-state">没有找到符合条件的道具</div>';
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <p>没有找到符合条件的道具</p>
+          <button class="reset-btn" onclick="ItemGallery.resetFilters()">重置筛选</button>
+        </div>
+      `;
       return;
     }
 
     container.innerHTML = this.filteredItems.map((item, index) => `
-      <div class="item-card ${this.selectedItem === index ? 'selected' : ''}" data-index="${index}">
+      <div class="item-card ${this.selectedItem === index ? 'selected' : ''}" 
+           data-index="${index}" 
+           tabindex="0"
+           title="${item.name}">
         <div class="item-icon ${this.getTierClass(item.tier)}">
           <i class="fas ${this.getCategoryIcon(item.category)}" aria-hidden="true"></i>
         </div>
@@ -651,15 +968,15 @@ const ItemGallery = {
         prevCard.classList.remove('selected');
       }
     }
-    
+
     // 设置新的选中状态
     this.selectedItem = index;
     const currentCard = document.querySelector(`.item-card[data-index="${index}"]`);
     if (currentCard) {
       currentCard.classList.add('selected');
     }
-    
-    // 显示详情
+
+    // 显示详情（只显示中文内容）
     this.showItemDetail(this.filteredItems[index]);
   },
 
@@ -681,15 +998,18 @@ const ItemGallery = {
     document.getElementById('detailCraftable').textContent = item.craftable === '是' ? '可制作' : '不可制作';
     document.getElementById('detailSource').textContent = item.source;
     document.getElementById('detailMap').textContent = item.map;
-    document.getElementById('detailLocation').textContent = item.location;
-    document.getElementById('detailDropRate').textContent = item.dropRate;
+    document.getElementById('detailLocation').textContent = item.location || '刷新点位待定';
+    document.getElementById('detailDropRate').textContent = item.dropRate || '数据待定';
 
     const attrsContainer = document.getElementById('detailAttrs');
-    if (item.attributes && item.attributes !== '无属性') {
+    if (item.attributes && item.attributes !== '无属性' && item.attributes.trim()) {
       const attrPairs = item.attributes.split(';').map(attr => attr.trim()).filter(attr => attr);
       attrsContainer.innerHTML = attrPairs.map(attr => {
         const [name, value] = attr.split(':').map(s => s.trim());
-        return `<div class="item-attr"><span class="attr-name">${name}:</span><span class="attr-value">${value}</span></div>`;
+        if (name && value) {
+          return `<div class="item-attr"><span class="attr-name">${name}:</span><span class="attr-value">${value}</span></div>`;
+        }
+        return `<div class="item-attr"><span class="attr-value">${attr}</span></div>`;
       }).join('');
     } else {
       attrsContainer.innerHTML = '<div class="item-attr no-attr">无属性</div>';

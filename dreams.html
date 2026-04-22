@@ -162,7 +162,7 @@
           <!-- 搜索框 -->
           <div class="gallery-search">
             <i class="fas fa-search"></i>
-            <input type="text" id="gallerySearchInput" placeholder="搜索道具名称...">
+            <input type="text" id="gallerySearchInput" placeholder="搜索道具名称..." autocomplete="off">
           </div>
 
           <!-- 筛选器 -->
@@ -418,8 +418,22 @@
 <script src="cache-buster.js"></script>
 <script src="sw-manager.js"></script>
 <script>
-  Components.init({ currentPage: 'dream', theme: 'dream' });
-</script>
+    let itemGallery;
+    window.onload = function() {
+      Components.init({ currentPage: 'dream', theme: 'dream' });
+      if (typeof PageNavigation !== 'undefined') {
+        PageNavigation.init('dream-home');
+      } else {
+        console.error('PageNavigation is not defined');
+      }
+      // 等待ItemGallery初始化完成后，将其赋值给全局变量
+      setTimeout(() => {
+        if (window.ItemGallery) {
+          itemGallery = window.ItemGallery;
+        }
+      }, 1000);
+    };
+  </script>
 
 </body>
 </html>
