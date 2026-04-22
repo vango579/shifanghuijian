@@ -7,7 +7,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>十方汇鉴</title>
-<link rel="icon" type="image/png" href="icon/app_icon_round.png">
+<link rel="icon" type="image/jpeg" href="icon/logo.jpeg">
+<link rel="shortcut icon" type="image/jpeg" href="icon/logo.jpeg">
+<link rel="apple-touch-icon" type="image/jpeg" href="icon/logo.jpeg">
 <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght@20..48,100..700&display=swap" rel="stylesheet">
 <script>
@@ -31,8 +33,10 @@
 <!-- 侧边栏 -->
 <aside class="sidebar">
   <div class="sidebar-header">
-    <img src="icon/logo.png" alt="十方汇鉴" class="sidebar-logo">
-    <span class="sidebar-title">十方汇鉴</span>
+    <div class="sidebar-logos">
+      <img src="icon/logo.jpeg" alt="十方汇鉴" class="sidebar-logo-main">
+      <img src="icon/zw-logo.png" alt="十方汇鉴" class="sidebar-logo-secondary">
+    </div>
   </div>
   
   <nav class="sidebar-nav">
@@ -41,7 +45,7 @@
       <span class="nav-text">首页</span>
     </a>
     <a class="nav-btn" data-page="dream" href="dreams.html">
-      <i class="fas fa-rocket"></i>
+      <img src="icon/mxyzc.png" alt="梦想与征程" class="nav-icon-img">
       <span class="nav-text">梦想与征程</span>
     </a>
   </nav>
@@ -59,12 +63,10 @@
   <!-- 顶部导航 - 首页不显示攻略、图鉴、数值、计时器标签 -->
   <header class="top-nav">
     <div class="top-nav-left">
-      <h1 class="top-nav-title" id="pageTitle">十方汇鉴</h1>
+      <img src="icon/zw-logo.png" alt="十方汇鉴" class="top-nav-logo" id="pageTitle">
     </div>
     
     <div class="top-nav-actions">
-      <i class="fas fa-bell"></i>
-      <i class="fas fa-cog"></i>
     </div>
   </header>
 

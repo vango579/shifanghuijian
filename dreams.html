@@ -7,7 +7,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>梦想与征程 - 十方汇鉴</title>
-<link rel="icon" type="image/png" href="icon/app_icon_round.png">
+<link rel="icon" type="image/jpeg" href="icon/logo.jpeg">
+<link rel="shortcut icon" type="image/jpeg" href="icon/logo.jpeg">
+<link rel="apple-touch-icon" type="image/jpeg" href="icon/logo.jpeg">
 <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght@20..48,100..700&display=swap" rel="stylesheet">
 <script>
@@ -32,10 +34,9 @@
 <aside class="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logos">
-      <img src="icon/logo1.png" alt="十方汇鉴" class="sidebar-logo-main">
-      <img src="icon/zw-logo.png" alt="征途" class="sidebar-logo-secondary">
+      <img src="icon/logo.jpeg" alt="十方汇鉴" class="sidebar-logo-main">
+      <img src="icon/zw-logo.png" alt="十方汇鉴" class="sidebar-logo-secondary">
     </div>
-    <span class="sidebar-title">十方汇鉴</span>
   </div>
   
   <nav class="sidebar-nav">
@@ -62,7 +63,7 @@
   <!-- 顶部导航 - 包含攻略、图鉴、数值、计时器 -->
   <header class="top-nav">
     <div class="top-nav-left">
-      <h1 class="top-nav-title" id="pageTitle">梦想与征程</h1>
+      <img src="icon/zw-logo.png" alt="十方汇鉴" class="top-nav-logo" id="pageTitle">
       
       <!-- 页面导航按钮 -->
       <nav class="page-nav" id="pageNav">
@@ -86,8 +87,6 @@
     </div>
     
     <div class="top-nav-actions">
-      <i class="fas fa-bell"></i>
-      <i class="fas fa-cog"></i>
     </div>
   </header>
 
@@ -100,7 +99,34 @@
         <div class="glow-effect glow-1"></div>
         <h2 class="hero-title">梦想与征程</h2>
         <p class="hero-subtitle">开启你的冒险之旅，探索未知的领域，书写属于你的传奇故事。</p>
+        <div class="download-container">
+          <button class="download-btn" id="downloadBtn">
+            <i class="fas fa-download"></i> 立即下载
+          </button>
+          <div class="download-options" id="downloadOptions">
+            <a href="https://sdkapi.zihuastudios.com/url/fBoS1qxZ" class="download-option" target="_blank" rel="noopener noreferrer">
+              <i class="fab fa-android"></i>
+              <span>安卓端</span>
+            </a>
+            <a href="https://sdkapi.zihuastudios.com/url/IAXdPoKO" class="download-option" target="_blank" rel="noopener noreferrer">
+              <i class="fab fa-apple"></i>
+              <span>iOS端</span>
+            </a>
+            <a href="https://sdkapi.zihuastudios.com/url/fBoS1qxZ" class="download-option" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-desktop"></i>
+              <span>PC模拟器</span>
+            </a>
+          </div>
+        </div>
       </section>
+
+      <!-- 角色展示容器 - 用于接收移动的角色卡片 -->
+      <div class="character-target-section" id="characterTargetSection"></div>
+
+      <!-- 角色展示控制按钮 -->
+      <button class="character-toggle-btn" id="characterToggleBtn">
+        <i class="fas fa-users"></i> 显示角色介绍
+      </button>
 
       <!-- 游戏攻略分类 -->
       <div class="guide-section">
@@ -152,6 +178,67 @@
           <div class="guide-meta">
             <span><i class="fas fa-calendar-alt"></i> 30分钟</span>
             <span><i class="fas fa-user"></i> 高阶</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 角色展示 -->
+      <div class="character-section">
+        <h3><i class="fas fa-users"></i> 角色介绍</h3>
+        <div class="character-cards">
+          <!-- 角色卡片 1 -->
+          <div class="character-card">
+            <div class="character-image">
+              <img src="icon/1.jpeg" alt="角色1">
+              <div class="character-tooltip">
+                <h4>角色介绍</h4>
+                <p>这是一个强大的战士角色，擅长近战战斗，拥有高防御和生命值。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 角色卡片 2 -->
+          <div class="character-card">
+            <div class="character-image">
+              <img src="icon/2.jpeg" alt="角色2">
+              <div class="character-tooltip">
+                <h4>角色介绍</h4>
+                <p>这是一个敏捷的精灵角色，擅长远程攻击，拥有高暴击率和闪避能力。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 角色卡片 3 -->
+          <div class="character-card">
+            <div class="character-image">
+              <img src="icon/3.jpeg" alt="角色3">
+              <div class="character-tooltip">
+                <h4>角色介绍</h4>
+                <p>这是一个暗黑精灵角色，擅长暗杀和潜行，拥有高爆发伤害。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 角色卡片 4 -->
+          <div class="character-card">
+            <div class="character-image">
+              <img src="icon/4.jpeg" alt="角色4">
+              <div class="character-tooltip">
+                <h4>角色介绍</h4>
+                <p>这是一个法师角色，擅长远程魔法攻击，拥有强大的元素伤害能力。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 角色卡片 5 -->
+          <div class="character-card">
+            <div class="character-image">
+              <img src="icon/5.jpeg" alt="角色5">
+              <div class="character-tooltip">
+                <h4>角色介绍</h4>
+                <p>这是一个领主角色，擅长领导和辅助，拥有增益技能和团队 buff。</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -213,8 +300,6 @@
               <button class="filter-btn" data-value="骑士">骑士</button>
               <button class="filter-btn" data-value="精灵">精灵</button>
               <button class="filter-btn" data-value="黑暗精灵">黑暗精灵</button>
-              <button class="filter-btn" data-value="黑妖">黑妖</button>
-              <button class="filter-btn" data-value="王族">王族</button>
               <button class="filter-btn" data-value="领主">领主</button>
               <button class="filter-btn" data-value="魔斗士">魔斗士</button>
               <button class="filter-btn" data-value="野蛮人">野蛮人</button>

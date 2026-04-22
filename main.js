@@ -270,13 +270,25 @@ const PageNavigation = {
     // 更新标题
     const pageTitle = document.getElementById('pageTitle');
     if (pageTitle) {
-      const titles = {
-        'dream-home': '攻略',
-        'dream-gallery': '图鉴',
-        'dream-calc': '数值',
-        'dream-timer': '计时器'
-      };
-      pageTitle.textContent = titles[page] || '梦想与征程';
+      // 如果是图片元素，更新 alt 属性
+      if (pageTitle.tagName === 'IMG') {
+        const titles = {
+          'dream-home': '攻略 - 十方汇鉴',
+          'dream-gallery': '图鉴 - 十方汇鉴',
+          'dream-calc': '数值 - 十方汇鉴',
+          'dream-timer': '计时器 - 十方汇鉴'
+        };
+        pageTitle.alt = titles[page] || '梦想与征程 - 十方汇鉴';
+      } else {
+        // 兼容原来的文本元素
+        const titles = {
+          'dream-home': '攻略',
+          'dream-gallery': '图鉴',
+          'dream-calc': '数值',
+          'dream-timer': '计时器'
+        };
+        pageTitle.textContent = titles[page] || '梦想与征程';
+      }
     }
 
     this.currentPage = page;
@@ -439,6 +451,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialPage = isDreamPage ? 'dream-home' : 'home';
 
   App.init({ page: initialPage });
+
+  // 角色卡片移动逻辑 - 默认执行
+  const characterSection = document.querySelector('.character-section');
+  const characterTarget = document.getElementById('characterTargetSection');
+  const toggleBtn = document.getElementById('characterToggleBtn');
+
+  if (characterSection && characterTarget) {
+    // 默认将角色卡片移动到目标位置
+    const cardsContainer = characterSection.querySelector('.character-cards');
+    if (cardsContainer) {
+      characterTarget.innerHTML = '';
+      const cardsClone = cardsContainer.cloneNode(true);
+      characterTarget.appendChild(cardsClone);
+    }
+
+    // 如果有切换按钮，添加点击事件
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        characterTarget.style.display = characterTarget.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+  }
+
+  // 下载按钮功能
+  const downloadBtn = document.getElementById('downloadBtn');
+  const downloadOptions = document.getElementById('downloadOptions');
+
+  if (downloadBtn && downloadOptions) {
+    // 点击下载按钮切换显示/隐藏选项
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      if (downloadOptions.classList.contains('show')) {
+        downloadOptions.classList.remove('show');
+      } else {
+        // 计算按钮位置 - 调整到指定位置
+        downloadOptions.style.position = 'fixed';
+        downloadOptions.style.top = '60px';
+        downloadOptions.style.right = '34px';
+        downloadOptions.classList.add('show');
+      }
+    });
+
+    // 点击页面其他地方关闭选项
+    document.addEventListener('click', (e) => {
+      if (!downloadOptions.contains(e.target) && !downloadBtn.contains(e.target)) {
+        downloadOptions.classList.remove('show');
+      }
+    });
+  }
 });
 
 // 将ItemGallery暴露给全局
@@ -894,7 +956,9 @@ const ItemGallery = {
         const selectedClass = this.filters.class;
         // 检查职业是否包含在道具的适用职业中
         const jobClasses = item.jobClass.split(/[\/\s,]+/).filter(c => c);
-        if (!jobClasses.some(job => selectedClass.includes(job) || job.includes(selectedClass))) {
+        // 全职业道具始终显示不过滤
+        const isAllClass = jobClasses.some(job => job.includes('全职业'));
+        if (!isAllClass && !jobClasses.some(job => selectedClass.includes(job) || job.includes(selectedClass))) {
           return false;
         }
       }
