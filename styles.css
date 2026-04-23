@@ -3279,7 +3279,6 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   background: var(--bg-secondary);
   border-radius: 8px;
   margin-bottom: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .gallery-search:focus-within {
@@ -3322,6 +3321,26 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
+}
+
+#filter-map {
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sidebar-border) transparent;
+}
+
+#filter-map::-webkit-scrollbar {
+  width: 4px;
+}
+
+#filter-map::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#filter-map::-webkit-scrollbar-thumb {
+  background: var(--sidebar-border);
+  border-radius: 2px;
 }
 
 .filter-btn {
@@ -3388,9 +3407,12 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
 }
 
 .items-list {
-  max-height: calc(100vh - 280px);
-  overflow-y: auto;
+  width: 330px;
+  height: 621px;
   padding: 8px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: auto;
 }
 
 .items-list::-webkit-scrollbar {
@@ -3416,6 +3438,8 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   transition: var(--transition);
   border: 1px solid transparent;
   will-change: transform;
+  min-height: 60px;
+  box-sizing: border-box;
 }
 
 .item-card:hover {
@@ -3443,6 +3467,7 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   justify-content: center;
   font-size: 20px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .item-icon.tier-common {
@@ -3477,6 +3502,10 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
 .item-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 .item-info h4 {
@@ -3675,6 +3704,63 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   word-break: break-word;
 }
 
+/* 怪物来源分组样式 */
+.source-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.source-group:last-child {
+  border-bottom: none;
+}
+
+.source-map {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.source-map::before {
+  content: '📍';
+  font-size: 10px;
+}
+
+.source-monsters {
+  font-size: 13px;
+  color: var(--text-primary);
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
+.theme-dream .source-map {
+  color: #e9c0fd;
+}
+
+.theme-dream .source-map::before {
+  content: '✦';
+}
+
+/* 怪物来源列表容器 */
+.source-list {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.source-list .source-group {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.source-list .source-group:last-child {
+  border-bottom: none;
+}
+
 .item-attrs {
   background: var(--bg-secondary);
   border-radius: 8px;
@@ -3827,6 +3913,7 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   font-size: 14px;
   outline: none;
   width: 100%;
+  box-shadow: none;
 }
 
 .gallery-search input::placeholder {
@@ -3837,37 +3924,6 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
 .gallery-search input:focus::placeholder {
   color: var(--text-secondary);
   opacity: 0.6;
-}
-
-/* 选中项高亮动画 */
-.item-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-  border: 1px solid transparent;
-}
-
-.item-card:hover {
-  background: var(--bg-secondary);
-}
-
-.item-card.selected {
-  background: var(--sidebar-icon-bg);
-  border-color: var(--accent);
-}
-
-.theme-dream .item-card.selected {
-  background: rgba(115, 81, 134, 0.2);
-  border-color: #e9c0fd;
-}
-
-.item-card:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
 }
 
 /* 统计信息增强 */

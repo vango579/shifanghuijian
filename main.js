@@ -353,14 +353,17 @@ const Timer = {
    */
   initFixedTimers() {
     const timerIds = ['3fxima', '3makur', '3fkasis', '3fbatu', '4fxima', '4makur', '4fkasis', '4fbatu', '4fodua', 'killer'];
-    // 清除旧的 localStorage 数据，重新初始化
-    localStorage.removeItem('fixedTimers');
+    const savedTimers = JSON.parse(localStorage.getItem('fixedTimers') || '{}');
     
     timerIds.forEach(id => {
-      this.fixedTimers[id] = {
-        remaining: this.FIXED_TIMER_DURATION,
-        running: false
-      };
+      if (savedTimers[id]) {
+        this.fixedTimers[id] = savedTimers[id];
+      } else {
+        this.fixedTimers[id] = {
+          remaining: this.FIXED_TIMER_DURATION,
+          running: false
+        };
+      }
     });
     
     this.updateFixedTimersDisplay();
@@ -808,7 +811,21 @@ const Timer = {
     const list = document.getElementById('customTimersList');
     if (!list) return;
 
-    const card = document.createElement('div');
+    let card = document.getElementById(`custom-timer-${timer.id}`);
+    
+    // 如果卡片已存在，更新按钮状态即可
+    if (card) {
+      const toggleBtn = card.querySelector('.timer-btn-toggle');
+      if (toggleBtn) {
+        toggleBtn.innerHTML = `<i class="fas ${timer.isRunning ? 'fa-pause' : 'fa-play'}"></i>`;
+        toggleBtn.title = timer.isRunning ? '暂停' : '开始';
+      }
+      this.applyTimerStyle(timer);
+      return;
+    }
+
+    // 创建新卡片
+    card = document.createElement('div');
     card.className = 'custom-timer-card';
     card.id = `custom-timer-${timer.id}`;
     card.style.setProperty('--timer-bg', timer.colors.bg);
@@ -962,12 +979,23 @@ const Timer = {
     if (!timer) return;
     
     timer.remaining = timer.mode === 'down' ? timer.original : 0;
-    timer.isRunning = true;
+    timer.isRunning = false;
     timer.lastTick = Date.now();
     timer.hasFlashed = false;
     
     this.saveCustomTimers();
-    this.renderCustomTimer(timer);
+    this.updateSingleCustomTimer(timer);
+    
+    // 更新按钮状态
+    const card = document.getElementById(`custom-timer-${id}`);
+    if (card) {
+      const toggleBtn = card.querySelector('.timer-btn-toggle');
+      if (toggleBtn) {
+        toggleBtn.innerHTML = '<i class="fas fa-play"></i>';
+        toggleBtn.title = '开始';
+      }
+      card.classList.remove('flash-anim');
+    }
   },
 
   /**
@@ -976,10 +1004,8 @@ const Timer = {
   updateCustomTimers() {
     this.customTimers.forEach(timer => this.updateSingleCustomTimer(timer));
     
-    // 每30秒保存一次
-    if (Math.floor(Date.now() / 1000) % 30 === 0) {
-      this.saveCustomTimers();
-    }
+    // 每秒保存一次
+    this.saveCustomTimers();
   },
 
   /**
@@ -1201,8 +1227,10 @@ const ItemGallery = {
     tier: '全部',
     category: '全部',
     subcategory: '全部',
-    class: '全部'
+    class: '全部',
+    map: '全部'
   },
+  availableMaps: [], // 可用的地图列表
   searchQuery: '',
   selectedItem: null,
   searchDebounceTimer: null, // 搜索防抖定时器
@@ -1322,16 +1350,9 @@ const ItemGallery = {
           craftMaterials: item["制作所需材料"] || "",
           craftable: item["是否可制作"] === '是' ? '是' : '否'
         }));
-        // 去重处理：根据道具名称去重
-        const uniqueItems = [];
-        const itemNames = new Set();
-        mappedItems.forEach(item => {
-          if (!itemNames.has(item.name)) {
-            itemNames.add(item.name);
-            uniqueItems.push(item);
-          }
-        });
-        this.items = uniqueItems;
+        // 去重处理：根据道具名称去重，合并怪物来源
+        this.items = this.mergeItemSources(mappedItems);
+        this.collectAvailableMaps();
         console.log(`[ItemGallery] 从 JSON 加载 ${this.items.length} 个道具（去重后）`);
       } else {
         // 回退到 CSV 格式
@@ -1344,16 +1365,9 @@ const ItemGallery = {
         }
         const csvText = await csvResponse.text();
         let csvItems = this.parseCSV(csvText);
-        // 去重处理：根据道具名称去重
-        const uniqueItems = [];
-        const itemNames = new Set();
-        csvItems.forEach(item => {
-          if (!itemNames.has(item.name)) {
-            itemNames.add(item.name);
-            uniqueItems.push(item);
-          }
-        });
-        this.items = uniqueItems;
+        // 去重处理：根据道具名称去重，合并怪物来源
+        this.items = this.mergeItemSources(csvItems);
+        this.collectAvailableMaps();
       }
 
       this.filteredItems = [...this.items];
@@ -1376,6 +1390,97 @@ const ItemGallery = {
         `;
       }
     }
+  },
+
+  /**
+   * 合并道具来源 - 将同一道具的所有怪物来源按地图分组
+   * @param {Array} items - 原始道具数组
+   * @returns {Array} - 合并后的道具数组，每个道具包含 sourcesByMap 属性
+   */
+  mergeItemSources(items) {
+    const itemMap = new Map();
+
+    items.forEach(item => {
+      const name = item.name;
+      const map = item.map || '未知地图';
+      const source = item.source;
+
+      if (!name) return; // 跳过无效数据
+
+      if (!itemMap.has(name)) {
+        // 首次遇到该道具，创建新记录
+        itemMap.set(name, {
+          ...item,
+          sourcesByMap: new Map([[map, source ? [source] : []]])
+        });
+      } else {
+        // 已存在该道具，合并来源
+        const existing = itemMap.get(name);
+        if (source && !existing.sourcesByMap.has(map)) {
+          // 该地图是新来源
+          existing.sourcesByMap.set(map, [source]);
+        } else if (source && !existing.sourcesByMap.get(map).includes(source)) {
+          // 同地图但不同怪物
+          existing.sourcesByMap.get(map).push(source);
+        }
+      }
+    });
+
+    // 转换为数组，并将 Map 转换为对象
+    return Array.from(itemMap.values()).map(item => ({
+      ...item,
+      sourcesByMap: Object.fromEntries(item.sourcesByMap)
+    }));
+  },
+
+  /**
+   * 收集所有可用的地图列表
+   */
+  collectAvailableMaps() {
+    const mapSet = new Set();
+    this.items.forEach(item => {
+      if (item.sourcesByMap) {
+        Object.keys(item.sourcesByMap).forEach(map => {
+          if (map && map !== '未知地图' && map.trim()) {
+            mapSet.add(map);
+          }
+        });
+      } else if (item.map && item.map.trim()) {
+        mapSet.add(item.map);
+      }
+    });
+    this.availableMaps = Array.from(mapSet).sort();
+    this.renderMapFilter();
+  },
+
+  /**
+   * 渲染地图筛选按钮
+   */
+  renderMapFilter() {
+    const container = document.getElementById('filter-map');
+    if (!container) return;
+
+    // 保留"全部"按钮
+    const allBtn = container.querySelector('.filter-btn[data-value="全部"]');
+    container.innerHTML = '';
+    if (allBtn) {
+      container.appendChild(allBtn);
+    } else {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn active';
+      btn.dataset.value = '全部';
+      btn.textContent = '全部';
+      container.appendChild(btn);
+    }
+
+    // 添加各地图按钮
+    this.availableMaps.forEach(map => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.value = map;
+      btn.textContent = map;
+      container.appendChild(btn);
+    });
   },
 
   /**
@@ -1606,7 +1711,7 @@ const ItemGallery = {
       });
     });
 
-    this.filters = { tier: '全部', category: '全部', subcategory: '全部', class: '全部' };
+    this.filters = { tier: '全部', category: '全部', subcategory: '全部', class: '全部', map: '全部' };
     this.applyFilters();
   },
 
@@ -1638,6 +1743,23 @@ const ItemGallery = {
         // 全职业道具始终显示不过滤
         const isAllClass = jobClasses.some(job => job.includes('全职业'));
         if (!isAllClass && !jobClasses.some(job => selectedClass.includes(job) || job.includes(selectedClass))) {
+          return false;
+        }
+      }
+      // 地图筛选
+      if (this.filters.map !== '全部') {
+        const selectedMap = this.filters.map;
+        if (item.sourcesByMap) {
+          // 新格式：检查 sourcesByMap 中是否有该地图
+          if (!Object.keys(item.sourcesByMap).some(map => map.includes(selectedMap))) {
+            return false;
+          }
+        } else if (item.map) {
+          // 旧格式
+          if (!item.map.includes(selectedMap)) {
+            return false;
+          }
+        } else {
           return false;
         }
       }
@@ -1829,8 +1951,37 @@ const ItemGallery = {
     
     document.getElementById('detailClass').textContent = item.jobClass;
     document.getElementById('detailCraftable').textContent = item.craftable === '是' ? '可制作' : '不可制作';
-    document.getElementById('detailSource').textContent = item.source;
-    document.getElementById('detailMap').textContent = item.map;
+
+    // 按地图分组显示怪物来源
+    const sourceContainer = document.getElementById('detailSource');
+    const mapContainer = document.getElementById('detailMap');
+    
+    if (item.sourcesByMap) {
+      // 新格式：按地图分组显示
+      const mapEntries = Object.entries(item.sourcesByMap);
+      if (mapEntries.length > 0) {
+        // 地图列表显示（简洁版）
+        mapContainer.textContent = mapEntries.map(([map]) => map).join('、');
+        
+        // 怪物来源显示（详细版，带地图标注）
+        sourceContainer.innerHTML = mapEntries.map(([map, sources]) => {
+          if (sources.length === 0 || (sources.length === 1 && !sources[0])) {
+            return `<div class="source-group"><span class="source-map">${map}</span><span class="source-monsters">来源不明</span></div>`;
+          }
+          return `<div class="source-group">
+            <span class="source-map">${map}</span>
+            <span class="source-monsters">${sources.join('、')}</span>
+          </div>`;
+        }).join('');
+      } else {
+        mapContainer.textContent = '无';
+        sourceContainer.textContent = '无';
+      }
+    } else {
+      // 旧格式兼容：单来源
+      mapContainer.textContent = item.map || '无';
+      sourceContainer.textContent = item.source || '无';
+    }
 
     const attrsContainer = document.getElementById('detailAttrs');
     if (item.attributes && item.attributes !== '无属性' && item.attributes.trim()) {

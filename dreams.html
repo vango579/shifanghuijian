@@ -35,7 +35,6 @@
   <div class="sidebar-header">
     <div class="sidebar-logos">
       <img src="icon/logo.jpeg" alt="十方汇鉴" class="sidebar-logo-main">
-      <img src="icon/zw-logo.png" alt="十方汇鉴" class="sidebar-logo-secondary">
     </div>
   </div>
   
@@ -63,7 +62,7 @@
   <!-- 顶部导航 - 包含攻略、图鉴、数值、计时器 -->
   <header class="top-nav">
     <div class="top-nav-left">
-      <img src="icon/zw-logo.png" alt="十方汇鉴" class="top-nav-logo" id="pageTitle">
+      <img src="icon/zw-logo-wind.png" alt="十方汇鉴" class="top-nav-logo" id="pageTitle">
       
       <!-- 页面导航按钮 -->
       <nav class="page-nav" id="pageNav">
@@ -304,6 +303,11 @@
               <button class="filter-btn" data-value="魔斗士">魔斗士</button>
               <button class="filter-btn" data-value="野蛮人">野蛮人</button>
             </div>
+
+            <h4 class="filter-title">所在地图</h4>
+            <div class="filter-buttons" id="filter-map">
+              <button class="filter-btn active" data-value="全部">全部</button>
+            </div>
           </div>
 
           <!-- 统计信息 -->
@@ -359,13 +363,10 @@
             <div class="detail-section">
               <h4><i class="fas fa-location-dot" aria-hidden="true"></i> 掉落信息</h4>
               <div class="detail-row">
-                <span class="detail-label">掉落来源</span>
-                <span class="detail-value" id="detailSource"></span>
-              </div>
-              <div class="detail-row">
                 <span class="detail-label">所在地图</span>
                 <span class="detail-value" id="detailMap"></span>
               </div>
+              <div class="source-list" id="detailSource"></div>
             </div>
             <div class="detail-section" id="detailCraftSection" style="display: none;">
               <h4><i class="fas fa-hammer" aria-hidden="true"></i> 制作材料</h4>
