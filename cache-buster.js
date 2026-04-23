@@ -16,12 +16,20 @@
  */
 const CacheBuster = {
   // 版本号：修改此值可强制刷新所有资源
-  VERSION: '20260422.1755',
+  VERSION: '20260423.1558',
   
+  // 是否每次打开时清除缓存（开发模式）
+  AUTO_CLEAR_ON_LOAD: true,
+
   /**
    * 初始化 - 为所有带 data-version 属性的资源添加版本号
    */
   init() {
+    // 每次打开时自动清除缓存（开发模式）
+    if (this.AUTO_CLEAR_ON_LOAD) {
+      this.clearAllCache();
+    }
+    
     this.addVersionToScripts();
     this.addVersionToStyles();
     this.setMetaVersion();
@@ -97,6 +105,32 @@ const CacheBuster = {
   clearStorage() {
     localStorage.removeItem('sidebarCollapsed');
     sessionStorage.clear();
+  },
+  
+  /**
+   * 清除所有缓存（开发模式使用）
+   */
+  clearAllCache() {
+    // 清除 localStorage
+    try {
+      localStorage.clear();
+    } catch (e) {
+      console.warn('无法清除 localStorage:', e);
+    }
+    
+    // 清除 sessionStorage
+    try {
+      sessionStorage.clear();
+    } catch (e) {
+      console.warn('无法清除 sessionStorage:', e);
+    }
+    
+    // 清除 Service Worker 缓存
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name));
+      });
+    }
   }
 };
 

@@ -323,91 +323,752 @@ const PageNavigation = {
  * 计时器模块
  */
 const Timer = {
-  eventTimeLeft: 2 * 60 * 60 + 34 * 60 + 15, // 2小时34分15秒
+  customTimers: [], // 自定义计时器列表
+  presets: [], // 预设列表
+  intervalId: null, // 计时器间隔ID
+  fixedTimers: {}, // 固定计时器 { id: { remaining: 秒数, running: boolean } }
+  fixedTimerInterval: null, // 固定计时器专用间隔ID
+  FIXED_TIMER_DURATION: 3600, // 1小时 = 3600秒
 
   /**
    * 初始化计时器
    */
   init() {
+    this.initFixedTimers();
     this.updateTimers();
-    this.updateEventTimer();
+    this.loadPresets();
+    this.renderPresets();
+    this.loadCustomTimers();
+    this.initCustomTimerUI();
     
-    // 每秒更新
-    setInterval(() => this.updateTimers(), 1000);
-    setInterval(() => this.updateEventTimer(), 1000);
+    // 高精度计时器更新（不含固定计时器）
+    this.startHighResEngine();
+    
+    // 启动固定计时器专用1秒间隔
+    this.startFixedTimerEngine();
+  },
+
+  /**
+   * 初始化固定计时器
+   */
+  initFixedTimers() {
+    const timerIds = ['3fxima', '3makur', '3fkasis', '3fbatu', '4fxima', '4makur', '4fkasis', '4fbatu', '4fodua', 'killer'];
+    // 清除旧的 localStorage 数据，重新初始化
+    localStorage.removeItem('fixedTimers');
+    
+    timerIds.forEach(id => {
+      this.fixedTimers[id] = {
+        remaining: this.FIXED_TIMER_DURATION,
+        running: false
+      };
+    });
+    
+    this.updateFixedTimersDisplay();
+    this.updateAllStartButtons();
+    
+    // 绑定重置全部按钮事件
+    const resetAllBtn = document.getElementById('resetAllFixedTimers');
+    if (resetAllBtn) {
+      resetAllBtn.onclick = () => this.resetAllFixedTimers();
+    }
+    
+    // 绑定每个卡片的按钮事件
+    document.querySelectorAll('.fixed-timer-card').forEach(card => {
+      const timerId = card.dataset.timer;
+      const startBtn = card.querySelector('.start-btn');
+      const resetBtn = card.querySelector('.reset-btn');
+      
+      if (startBtn) {
+        startBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggleFixedTimer(timerId);
+        });
+      }
+      
+      if (resetBtn) {
+        resetBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.resetFixedTimer(timerId);
+        });
+      }
+    });
+  },
+
+  /**
+   * 启动固定计时器引擎（1秒间隔）
+   */
+  startFixedTimerEngine() {
+    if (this.fixedTimerInterval) {
+      clearInterval(this.fixedTimerInterval);
+    }
+    this.fixedTimerInterval = setInterval(() => {
+      this.tickFixedTimers();
+    }, 1000);
+  },
+
+  /**
+   * 每秒更新固定计时器
+   */
+  tickFixedTimers() {
+    let hasChanges = false;
+    Object.keys(this.fixedTimers).forEach(id => {
+      const timer = this.fixedTimers[id];
+      if (timer.running && timer.remaining > 0) {
+        timer.remaining--;
+        this.updateFixedTimerDisplay(id);
+        hasChanges = true;
+      }
+    });
+    if (hasChanges) {
+      this.saveFixedTimers();
+    }
+  },
+
+  /**
+   * 切换固定计时器开始/暂停
+   */
+  toggleFixedTimer(id) {
+    if (this.fixedTimers[id]) {
+      this.fixedTimers[id].running = !this.fixedTimers[id].running;
+      this.updateStartButton(id);
+      this.saveFixedTimers();
+    }
+  },
+
+  /**
+   * 更新单个开始按钮状态
+   */
+  updateStartButton(id) {
+    const timer = this.fixedTimers[id];
+    if (!timer) return;
+    
+    const card = document.querySelector(`[data-timer="${id}"]`);
+    if (card) {
+      const btn = card.querySelector('.start-btn');
+      if (btn) {
+        btn.textContent = timer.running ? '暂停' : '开始';
+        btn.classList.toggle('running', timer.running);
+      }
+    }
+  },
+
+  /**
+   * 更新所有开始按钮状态
+   */
+  updateAllStartButtons() {
+    Object.keys(this.fixedTimers).forEach(id => {
+      this.updateStartButton(id);
+    });
+  },
+
+  /**
+   * 更新单个固定计时器显示
+   */
+  updateFixedTimerDisplay(id) {
+    const timer = this.fixedTimers[id];
+    if (!timer) return;
+    
+    const card = document.querySelector(`[data-timer="${id}"]`);
+    if (card) {
+      const display = card.querySelector('.fixed-timer-display');
+      if (display) {
+        const hours = Math.floor(timer.remaining / 3600);
+        const mins = Math.floor((timer.remaining % 3600) / 60);
+        const secs = timer.remaining % 60;
+        display.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        
+        if (timer.remaining === 0) {
+          display.classList.add('timer-ended');
+          timer.running = false;
+          this.updateStartButton(id);
+        } else {
+          display.classList.remove('timer-ended');
+        }
+      }
+    }
+  },
+
+  /**
+   * 更新所有固定计时器显示
+   */
+  updateFixedTimersDisplay() {
+    Object.keys(this.fixedTimers).forEach(id => {
+      this.updateFixedTimerDisplay(id);
+    });
+  },
+
+  /**
+   * 重置单个固定计时器
+   */
+  resetFixedTimer(id) {
+    if (this.fixedTimers[id]) {
+      this.fixedTimers[id].remaining = this.FIXED_TIMER_DURATION;
+      this.fixedTimers[id].running = false;
+      this.updateFixedTimerDisplay(id);
+      this.updateStartButton(id);
+      this.saveFixedTimers();
+    }
+  },
+
+  /**
+   * 重置所有固定计时器
+   */
+  resetAllFixedTimers() {
+    Object.keys(this.fixedTimers).forEach(id => {
+      this.fixedTimers[id].remaining = this.FIXED_TIMER_DURATION;
+      this.fixedTimers[id].running = false;
+      this.updateFixedTimerDisplay(id);
+      this.updateStartButton(id);
+    });
+    this.saveFixedTimers();
+  },
+
+  /**
+   * 保存固定计时器到localStorage
+   */
+  saveFixedTimers() {
+    localStorage.setItem('fixedTimers', JSON.stringify(this.fixedTimers));
+  },
+
+  /**
+   * 启动高精度计时引擎（用于自定义计时器）
+   */
+  startHighResEngine() {
+    if (this.intervalId) cancelAnimationFrame(this.intervalId);
+    
+    const update = () => {
+      this.updateTimers();
+      this.updateCustomTimers();
+      this.intervalId = requestAnimationFrame(update);
+    };
+    this.intervalId = requestAnimationFrame(update);
   },
 
   /**
    * 更新每日计时器
    */
   updateTimers() {
-    const now = new Date();
+    // 内置计时器已移除
+  },
+
+  /**
+   * 重置所有固定计时器
+   */
+  resetAllFixedTimers() {
+    Object.keys(this.fixedTimers).forEach(id => {
+      this.fixedTimers[id].remaining = this.FIXED_TIMER_DURATION;
+      this.fixedTimers[id].running = false;
+      this.updateFixedTimerDisplay(id);
+      this.updateStartButton(id);
+    });
+    this.saveFixedTimers();
+  },
+
+  /**
+   * 保存固定计时器到localStorage
+   */
+  saveFixedTimers() {
+    localStorage.setItem('fixedTimers', JSON.stringify(this.fixedTimers));
+  },
+
+  /**
+   * 启动高精度计时引擎（用于自定义计时器）
+   */
+  startHighResEngine() {
+    if (this.intervalId) cancelAnimationFrame(this.intervalId);
     
-    // 每日签到倒计时
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const diffSignin = tomorrow - now;
+    const update = () => {
+      this.updateTimers();
+      this.updateCustomTimers();
+      this.intervalId = requestAnimationFrame(update);
+    };
+    this.intervalId = requestAnimationFrame(update);
+  },
+
+  /**
+   * 更新每日计时器
+   */
+  updateTimers() {
+    // 内置计时器已移除
+  },
+
+  /**
+   * 初始化自定义计时器UI
+   */
+  initCustomTimerUI() {
+    const addBtn = document.getElementById('addTimerBtn');
+    const modal = document.getElementById('timerModal');
+    const closeBtn = document.getElementById('timerModalClose');
+    const cancelBtn = document.getElementById('timerBtnCancel');
+    const confirmBtn = document.getElementById('timerBtnConfirm');
+    const savePresetBtn = document.getElementById('timerBtnSavePreset');
+
+    if (!addBtn || !modal) return;
+
+    // 添加按钮点击
+    addBtn.addEventListener('click', () => {
+      modal.classList.add('show');
+      this.resetForm();
+    });
+
+    // 关闭弹窗
+    const closeModal = () => modal.classList.remove('show');
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // 确认添加
+    confirmBtn?.addEventListener('click', () => {
+      this.addCustomTimer();
+      closeModal();
+    });
+
+    // 保存预设
+    savePresetBtn?.addEventListener('click', () => {
+      this.saveAsPreset();
+    });
+
+    // 计时模式切换
+    document.querySelectorAll('input[name="timerMode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        document.querySelectorAll('.timer-mode-option').forEach(opt => opt.classList.remove('active'));
+        e.target.closest('.timer-mode-option').classList.add('active');
+        
+        const countdownOptions = document.getElementById('countdownOptions');
+        if (countdownOptions) {
+          countdownOptions.style.display = e.target.value === 'down' ? 'block' : 'none';
+        }
+      });
+    });
+
+    // 快速设置按钮
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mins = parseInt(btn.dataset.mins);
+        document.getElementById('timerMinutes').value = mins;
+        document.getElementById('timerSeconds').value = '0';
+      });
+    });
+  },
+
+  /**
+   * 重置表单
+   */
+  resetForm() {
+    document.getElementById('timerName').value = '';
+    document.getElementById('timerHours').value = '';
+    document.getElementById('timerMinutes').value = '';
+    document.getElementById('timerSeconds').value = '';
+    document.getElementById('timerBgColor').value = '#2a2235';
+    document.getElementById('timerBorderColor').value = '#735186';
+    document.getElementById('timerTextColor').value = '#e9c0fd';
+    document.getElementById('timerEndColor').value = '#e74c3c';
     
-    const hours = Math.floor(diffSignin / (1000 * 60 * 60));
-    const mins = Math.floor((diffSignin % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diffSignin % (1000 * 60)) / 1000);
-    
-    const signinTimer = document.getElementById('timer-signin');
-    if (signinTimer) {
-      signinTimer.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    // 重置模式为倒计时
+    document.querySelectorAll('input[name="timerMode"]').forEach((radio, i) => {
+      radio.checked = i === 0;
+    });
+    document.querySelectorAll('.timer-mode-option').forEach((opt, i) => {
+      opt.classList.toggle('active', i === 0);
+    });
+  },
+
+  /**
+   * 添加自定义计时器
+   */
+  addCustomTimer(presetData = null) {
+    const name = presetData?.name || document.getElementById('timerName').value.trim();
+    const mode = presetData?.mode || document.querySelector('input[name="timerMode"]:checked').value;
+    const hours = parseInt(presetData?.hours || document.getElementById('timerHours').value) || 0;
+    const minutes = parseInt(presetData?.minutes || document.getElementById('timerMinutes').value) || 0;
+    const seconds = parseInt(presetData?.seconds || document.getElementById('timerSeconds').value) || 0;
+    const bgColor = presetData?.bgColor || document.getElementById('timerBgColor').value;
+    const borderColor = presetData?.borderColor || document.getElementById('timerBorderColor').value;
+    const textColor = presetData?.textColor || document.getElementById('timerTextColor').value;
+    const endColor = presetData?.endColor || document.getElementById('timerEndColor').value;
+
+    if (!name) {
+      alert('请输入计时器名称');
+      return;
     }
 
-    // 体力恢复倒计时（每6分钟恢复1点体力）
-    const staminaMinutes = 6;
-    const totalSecsIntoDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-    const staminaSecs = (staminaMinutes * 60) - (totalSecsIntoDay % (staminaMinutes * 60));
-    const staminaMins = Math.floor(staminaSecs / 60);
-    const staminaSec = staminaSecs % 60;
-    
-    const staminaTimer = document.getElementById('timer-stamina');
-    if (staminaTimer) {
-      staminaTimer.textContent = `${String(staminaMins).padStart(2, '0')}:${String(staminaSec).padStart(2, '0')}`;
+    const totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
+
+    if (mode === 'down' && totalMs <= 0) {
+      alert('倒计时模式请输入时间！');
+      return;
     }
 
-    // 周常副本倒计时
-    const weekDay = now.getDay();
-    // 周一时设为7天，避免负数
-    const daysUntilMonday = weekDay === 1 ? 7 : (8 - weekDay) % 7;
-    const nextMonday = new Date(now);
-    nextMonday.setDate(nextMonday.getDate() + daysUntilMonday);
-    nextMonday.setHours(0, 0, 0, 0);
-    const diffWeekly = nextMonday - now;
+    const timer = {
+      id: Date.now() + Math.random(),
+      name: name,
+      mode: mode,
+      original: totalMs,
+      remaining: mode === 'down' ? totalMs : 0,
+      isRunning: true,
+      lastTick: Date.now(),
+      hasFlashed: false,
+      colors: {
+        bg: bgColor,
+        border: borderColor,
+        text: textColor,
+        end: endColor
+      }
+    };
+
+    this.customTimers.push(timer);
+    this.saveCustomTimers();
+    this.renderCustomTimer(timer);
     
-    const weeklyDays = Math.floor(diffWeekly / (1000 * 60 * 60 * 24));
-    const weeklyHours = Math.floor((diffWeekly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const weeklyMins = Math.floor((diffWeekly % (1000 * 60 * 60)) / (1000 * 60));
-    const weeklySecs = Math.floor((diffWeekly % (1000 * 60)) / 1000);
-    
-    const weeklyTimer = document.getElementById('timer-weekly');
-    if (weeklyTimer) {
-      weeklyTimer.textContent = `${weeklyDays}天 ${String(weeklyHours).padStart(2, '0')}:${String(weeklyMins).padStart(2, '0')}:${String(weeklySecs).padStart(2, '0')}`;
+    // 清空表单（仅在非预设添加时）
+    if (!presetData) {
+      document.getElementById('timerName').value = '';
+      document.getElementById('timerHours').value = '';
+      document.getElementById('timerMinutes').value = '';
+      document.getElementById('timerSeconds').value = '';
     }
   },
 
   /**
-   * 更新事件计时器
+   * 保存为预设
    */
-  updateEventTimer() {
-    const hours = Math.floor(this.eventTimeLeft / (60 * 60));
-    const mins = Math.floor((this.eventTimeLeft % (60 * 60)) / 60);
-    const secs = this.eventTimeLeft % 60;
+  saveAsPreset() {
+    const name = document.getElementById('timerName').value.trim() || '自定义预设';
+    const mode = document.querySelector('input[name="timerMode"]:checked').value;
+    const hours = parseInt(document.getElementById('timerHours').value) || 0;
+    const minutes = parseInt(document.getElementById('timerMinutes').value) || 0;
+    const seconds = parseInt(document.getElementById('timerSeconds').value) || 0;
+    const bgColor = document.getElementById('timerBgColor').value;
+    const borderColor = document.getElementById('timerBorderColor').value;
+    const textColor = document.getElementById('timerTextColor').value;
+    const endColor = document.getElementById('timerEndColor').value;
+
+    this.presets.push({
+      id: Date.now(),
+      name: name,
+      mode: mode,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+      bgColor: bgColor,
+      borderColor: borderColor,
+      textColor: textColor,
+      endColor: endColor
+    });
+
+    this.savePresets();
+    this.renderPresets();
+    alert('预设已保存！');
+  },
+
+  /**
+   * 渲染预设标签
+   */
+  renderPresets() {
+    const container = document.getElementById('timerPresets');
+    if (!container) return;
     
-    const eventTimer = document.getElementById('timer-event');
-    if (eventTimer) {
-      eventTimer.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    container.innerHTML = '';
+    this.presets.forEach(p => {
+      const tag = document.createElement('div');
+      tag.className = 'preset-tag';
+      tag.innerHTML = `
+        <span class="preset-name">${this.escapeHtml(p.name)}</span>
+        <span class="preset-del" data-id="${p.id}">✖</span>
+      `;
+      
+      tag.querySelector('.preset-name').addEventListener('click', () => {
+        this.addCustomTimer(p);
+      });
+      
+      tag.querySelector('.preset-del').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.deletePreset(p.id);
+      });
+      
+      container.appendChild(tag);
+    });
+  },
+
+  /**
+   * 删除预设
+   */
+  deletePreset(id) {
+    this.presets = this.presets.filter(p => p.id !== id);
+    this.savePresets();
+    this.renderPresets();
+  },
+
+  /**
+   * 渲染单个自定义计时器
+   */
+  renderCustomTimer(timer) {
+    const list = document.getElementById('customTimersList');
+    if (!list) return;
+
+    const card = document.createElement('div');
+    card.className = 'custom-timer-card';
+    card.id = `custom-timer-${timer.id}`;
+    card.style.setProperty('--timer-bg', timer.colors.bg);
+    card.style.setProperty('--timer-border', timer.colors.border);
+    card.style.setProperty('--timer-text', timer.colors.text);
+    card.style.setProperty('--timer-end', timer.colors.end);
+    
+    card.innerHTML = `
+      <div class="timer-info">
+        <h4>${this.escapeHtml(timer.name)} ${timer.mode === 'up' ? '⏱️' : ''}</h4>
+        <p class="timer-mode-label">${timer.mode === 'down' ? '倒计时' : '正计时'}</p>
+      </div>
+      <div class="custom-timer-display" id="display-${timer.id}">--:--:--</div>
+      <div class="custom-timer-btns">
+        <button class="timer-btn-toggle" data-id="${timer.id}" title="${timer.isRunning ? '暂停' : '开始'}">
+          <i class="fas ${timer.isRunning ? 'fa-pause' : 'fa-play'}"></i>
+        </button>
+        <button class="timer-btn-reset" data-id="${timer.id}" title="重置">
+          <i class="fas fa-redo"></i>
+        </button>
+        <button class="timer-btn-delete" data-id="${timer.id}" title="删除">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    list.appendChild(card);
+
+    // 按钮事件
+    card.querySelector('.timer-btn-toggle').addEventListener('click', () => {
+      this.toggleTimer(timer.id);
+    });
+    
+    card.querySelector('.timer-btn-reset').addEventListener('click', () => {
+      this.resetTimer(timer.id);
+    });
+    
+    card.querySelector('.timer-btn-delete').addEventListener('click', () => {
+      this.deleteCustomTimer(timer.id);
+    });
+
+    // 应用初始样式
+    this.applyTimerStyle(timer);
+    
+    // 立即更新
+    this.updateSingleCustomTimer(timer);
+  },
+
+  /**
+   * 应用计时器样式
+   */
+  applyTimerStyle(timer) {
+    const card = document.getElementById(`custom-timer-${timer.id}`);
+    const display = document.getElementById(`display-${timer.id}`);
+    if (!card || !display) return;
+
+    const isEnded = timer.mode === 'down' && timer.remaining <= 0;
+    const color = isEnded ? timer.colors.end : timer.colors.text;
+    const bgColor = isEnded ? timer.colors.end : timer.colors.bg;
+    const borderColor = isEnded ? timer.colors.end : timer.colors.border;
+
+    display.style.color = color;
+    card.style.backgroundColor = bgColor;
+    card.style.borderColor = borderColor;
+  },
+
+  /**
+   * 格式化时间
+   */
+  formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    
+    if (h > 0) {
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  },
+
+  /**
+   * 更新单个自定义计时器
+   */
+  updateSingleCustomTimer(timer) {
+    const display = document.getElementById(`display-${timer.id}`);
+    const card = document.getElementById(`custom-timer-${timer.id}`);
+    if (!display || !card) return;
+
+    if (timer.isRunning) {
+      const now = Date.now();
+      const elapsed = now - (timer.lastTick || now);
+      timer.lastTick = now;
+
+      if (timer.mode === 'down') {
+        timer.remaining -= elapsed;
+        if (timer.remaining < 0) timer.remaining = 0;
+      } else {
+        timer.remaining += elapsed;
+      }
+    }
+
+    // 更新显示
+    display.textContent = this.formatTime(timer.remaining);
+
+    // 应用样式
+    this.applyTimerStyle(timer);
+
+    // 结束效果
+    if (timer.mode === 'down' && timer.remaining <= 0 && !timer.hasFlashed) {
+      timer.hasFlashed = true;
+      card.classList.add('flash-anim');
+      
+      // 尝试播放提示音
+      this.playAlertSound();
+    }
+  },
+
+  /**
+   * 播放提示音
+   */
+  playAlertSound() {
+    try {
+      const audio = new Audio();
+      audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQYAKI/R7LyAQBU1lMzqv4NNGzWNzea8hE0cO5HN6byFTx89lc3pvIZRJD+Szei8h1MnQZDM6L2IVylFkMzovYlYK0aRzOe9iVkuSZLM572KWi9LksznvYpaL0yTzOe9ilswT5PN572LWzFQk83nvYtcMlGTzee9i10zUpPN572LXjNTlM3nvYteNFSVzea9i180VZbN5r2LYDhWl83mvcx';
+      audio.play().catch(() => {});
+    } catch (e) {}
+  },
+
+  /**
+   * 切换计时器运行状态
+   */
+  toggleTimer(id) {
+    const timer = this.customTimers.find(t => t.id === id);
+    if (!timer) return;
+    
+    timer.isRunning = !timer.isRunning;
+    if (timer.isRunning) {
+      timer.lastTick = Date.now();
     }
     
-    if (this.eventTimeLeft > 0) {
-      this.eventTimeLeft--;
-    } else {
-      this.eventTimeLeft = 0;
+    this.saveCustomTimers();
+    this.renderCustomTimer(timer);
+  },
+
+  /**
+   * 重置计时器
+   */
+  resetTimer(id) {
+    const timer = this.customTimers.find(t => t.id === id);
+    if (!timer) return;
+    
+    timer.remaining = timer.mode === 'down' ? timer.original : 0;
+    timer.isRunning = true;
+    timer.lastTick = Date.now();
+    timer.hasFlashed = false;
+    
+    this.saveCustomTimers();
+    this.renderCustomTimer(timer);
+  },
+
+  /**
+   * 更新所有自定义计时器
+   */
+  updateCustomTimers() {
+    this.customTimers.forEach(timer => this.updateSingleCustomTimer(timer));
+    
+    // 每30秒保存一次
+    if (Math.floor(Date.now() / 1000) % 30 === 0) {
+      this.saveCustomTimers();
     }
+  },
+
+  /**
+   * 删除自定义计时器
+   */
+  deleteCustomTimer(id) {
+    this.customTimers = this.customTimers.filter(t => t.id !== id);
+    this.saveCustomTimers();
+    const card = document.getElementById(`custom-timer-${id}`);
+    if (card) card.remove();
+  },
+
+  /**
+   * 保存自定义计时器到localStorage
+   */
+  saveCustomTimers() {
+    try {
+      localStorage.setItem('customTimers', JSON.stringify(this.customTimers));
+    } catch (e) {
+      console.warn('无法保存计时器数据:', e);
+    }
+  },
+
+  /**
+   * 从localStorage加载自定义计时器
+   */
+  loadCustomTimers() {
+    try {
+      const saved = localStorage.getItem('customTimers');
+      if (saved) {
+        this.customTimers = JSON.parse(saved);
+        const now = Date.now();
+        
+        // 恢复计时器状态
+        this.customTimers.forEach(t => {
+          if (t.hasFlashed === undefined) t.hasFlashed = false;
+          
+          if (t.isRunning) {
+            const elapsedMs = now - t.lastTick;
+            if (t.mode === 'down') {
+              t.remaining -= elapsedMs;
+              if (t.remaining < 0) t.remaining = 0;
+            } else {
+              t.remaining += elapsedMs;
+            }
+            t.lastTick = now;
+          }
+        });
+        
+        // 渲染已保存的计时器
+        this.customTimers.forEach(timer => this.renderCustomTimer(timer));
+      }
+    } catch (e) {
+      console.warn('无法加载计时器数据:', e);
+    }
+  },
+
+  /**
+   * 保存预设
+   */
+  savePresets() {
+    try {
+      localStorage.setItem('timerPresets', JSON.stringify(this.presets));
+    } catch (e) {
+      console.warn('无法保存预设数据:', e);
+    }
+  },
+
+  /**
+   * 加载预设
+   */
+  loadPresets() {
+    try {
+      const saved = localStorage.getItem('timerPresets');
+      if (saved) {
+        this.presets = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('无法加载预设数据:', e);
+    }
+  },
+
+  /**
+   * HTML转义
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 };
 
@@ -433,9 +1094,7 @@ const App = {
     }
 
     // 初始化计时器
-    if (document.getElementById('timer-signin')) {
-      Timer.init();
-    }
+    Timer.init();
 
     // 初始化道具图鉴
     if (document.getElementById('galleryItems')) {
@@ -486,19 +1145,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (downloadOptions.classList.contains('show')) {
         downloadOptions.classList.remove('show');
       } else {
-        // 计算按钮位置 - 调整到指定位置
-        downloadOptions.style.position = 'fixed';
-        downloadOptions.style.top = '60px';
-        downloadOptions.style.right = '34px';
-        downloadOptions.classList.add('show');
+        // 获取按钮位置，让下拉菜单紧贴按钮下方
+        const btnRect = downloadBtn.getBoundingClientRect();
+        if (btnRect) {
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+          
+          // 设置下拉菜单位置（相对于视口）
+          downloadOptions.style.position = 'absolute';
+          downloadOptions.style.top = (btnRect.bottom - scrollTop + 8) + 'px';
+          downloadOptions.style.left = (btnRect.left - scrollLeft) + 'px';
+          downloadOptions.style.width = btnRect.width + 'px';
+          downloadOptions.style.right = 'auto';
+          downloadOptions.classList.add('show');
+        }
       }
     });
 
     // 点击页面其他地方关闭选项
     document.addEventListener('click', (e) => {
-      if (!downloadOptions.contains(e.target) && !downloadBtn.contains(e.target)) {
+      if (downloadOptions && downloadBtn && !downloadOptions.contains(e.target) && !downloadBtn.contains(e.target)) {
         downloadOptions.classList.remove('show');
       }
+    });
+  }
+
+  // 伤害计算器功能
+  const calcBtn = document.getElementById('calcDamageBtn');
+  const resultDiv = document.getElementById('damageResult');
+
+  if (calcBtn && resultDiv) {
+    calcBtn.addEventListener('click', () => {
+      // 暂时显示提示，后续添加具体计算逻辑
+      resultDiv.textContent = '计算功能开发中...';
     });
   }
 });

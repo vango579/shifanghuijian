@@ -26,7 +26,7 @@
     }
   } catch (e) {}
 </script>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css" data-version>
 </head>
 <body class="theme-dream">
 
@@ -384,66 +384,27 @@
         <p class="hero-subtitle">精准的角色数值分析，助你优化配装策略。</p>
       </section>
 
-      <div class="calc-card">
-        <h3>夜刃 - Kael 属性分析</h3>
-        <div class="calc-row">
-          <span class="calc-label">攻击力</span>
-          <span class="calc-value">98</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 98%"></div>
-        </div>
-        
-        <div class="calc-row" style="margin-top: 16px;">
-          <span class="calc-label">防御力</span>
-          <span class="calc-value">45</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 45%"></div>
-        </div>
-        
-        <div class="calc-row" style="margin-top: 16px;">
-          <span class="calc-label">速度</span>
-          <span class="calc-value">92</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 92%"></div>
+      <div class="damage-calc-container">
+        <div class="damage-calc-grid">
+          <div class="damage-calc-box" data-type="transform">
+            <h4 class="box-title">变身卡</h4>
+            <div class="box-content"></div>
+          </div>
+          
+          <div class="damage-calc-box" data-type="doll">
+            <h4 class="box-title">魔法娃娃</h4>
+            <div class="box-content"></div>
+          </div>
+          
+          <div class="damage-calc-box" data-type="weapon">
+            <h4 class="box-title">武器</h4>
+            <div class="box-content"></div>
+          </div>
         </div>
         
-        <div class="calc-row" style="margin-top: 16px;">
-          <span class="calc-label">生命值</span>
-          <span class="calc-value">3200</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 65%"></div>
-        </div>
-      </div>
-
-      <div class="calc-card">
-        <h3>流光 - Lyra 属性分析</h3>
-        <div class="calc-row">
-          <span class="calc-label">攻击力</span>
-          <span class="calc-value">52</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 52%"></div>
-        </div>
+        <button class="damage-calc-btn" id="calcDamageBtn">计算伤害</button>
         
-        <div class="calc-row" style="margin-top: 16px;">
-          <span class="calc-label">防御力</span>
-          <span class="calc-value">78</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 78%"></div>
-        </div>
-        
-        <div class="calc-row" style="margin-top: 16px;">
-          <span class="calc-label">治疗量</span>
-          <span class="calc-value">95</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 95%"></div>
-        </div>
+        <div class="damage-result" id="damageResult"></div>
       </div>
     </div>
 
@@ -455,36 +416,187 @@
         <p class="hero-subtitle">追踪重要活动时间，不再错过任何奖励。</p>
       </section>
 
-      <div class="timer-card">
-        <div class="timer-info">
-          <h4>每日签到</h4>
-          <p>每日凌晨重置</p>
+      <!-- 固定副本计时器 -->
+      <section class="fixed-timers-section">
+        <h3 class="section-title">副本冷却计时</h3>
+        <div class="fixed-timers-grid" id="fixedTimersGrid">
+          <div class="fixed-timer-card" data-timer="3fxima">
+            <h4>3f西玛</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="3makur">
+            <h4>3马库尔</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="3fkasis">
+            <h4>3f卡士伯</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="3fbatu">
+            <h4>3f巴土瑟</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="4fxima">
+            <h4>4f西玛</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="4makur">
+            <h4>4马库尔</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="4fkasis">
+            <h4>4f卡士伯</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="4fbatu">
+            <h4>4f巴土瑟</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="4fodua">
+            <h4>4f奥杜亚</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
+          <div class="fixed-timer-card" data-timer="killer">
+            <h4>杀戮者</h4>
+            <div class="fixed-timer-display">01:00:00</div>
+            <div class="fixed-timer-btns">
+              <button class="fixed-timer-btn start-btn" data-action="start">开始</button>
+              <button class="fixed-timer-btn reset-btn" data-action="reset">重置</button>
+            </div>
+          </div>
         </div>
-        <div class="timer-countdown" id="timer-signin">--:--:--</div>
-      </div>
+        <div class="fixed-timers-actions">
+          <button class="fixed-timer-btn reset-all-btn" id="resetAllFixedTimers">全部重置</button>
+        </div>
+      </section>
 
-      <div class="timer-card">
-        <div class="timer-info">
-          <h4>体力恢复</h4>
-          <p>每 6 分钟恢复 1 点</p>
+      <!-- 自定义计时器区域 -->
+      <div class="custom-timers-section">
+        <div class="custom-timers-header">
+          <h3>自定义计时器</h3>
+          <button class="add-timer-btn" id="addTimerBtn">
+            <i class="fas fa-plus"></i>
+            <span>添加计时</span>
+          </button>
         </div>
-        <div class="timer-countdown" id="timer-stamina">--:--</div>
+        
+        <!-- 预设快捷标签 -->
+        <div class="timer-presets" id="timerPresets"></div>
+        
+        <!-- 自定义计时器列表 -->
+        <div class="custom-timers-list" id="customTimersList"></div>
       </div>
+    </div>
 
-      <div class="timer-card">
-        <div class="timer-info">
-          <h4>周常副本</h4>
-          <p>每周一凌晨重置</p>
+    <!-- 添加计时器弹窗 -->
+    <div class="timer-modal" id="timerModal">
+      <div class="timer-modal-content">
+        <div class="timer-modal-header">
+          <h3>添加自定义计时器</h3>
+          <button class="timer-modal-close" id="timerModalClose">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-        <div class="timer-countdown" id="timer-weekly">--天 --:--:--</div>
-      </div>
-
-      <div class="timer-card">
-        <div class="timer-info">
-          <h4>限时活动</h4>
-          <p>剩余时间</p>
+        <div class="timer-modal-body">
+          <div class="timer-form-group">
+            <label for="timerName">计时器名称</label>
+            <input type="text" id="timerName" placeholder="例如：限时活动、签到奖励">
+          </div>
+          <div class="timer-form-group">
+            <label>计时模式</label>
+            <div class="timer-mode-select">
+              <label class="timer-mode-option active">
+                <input type="radio" name="timerMode" value="down" checked>
+                <span>倒计时</span>
+              </label>
+              <label class="timer-mode-option">
+                <input type="radio" name="timerMode" value="up">
+                <span>正计时(秒表)</span>
+              </label>
+            </div>
+          </div>
+          <div class="timer-form-group" id="countdownOptions">
+            <label>设置时长</label>
+            <div class="timer-duration-inputs">
+              <input type="number" id="timerHours" min="0" max="999" placeholder="时">
+              <span>:</span>
+              <input type="number" id="timerMinutes" min="0" max="59" placeholder="分">
+              <span>:</span>
+              <input type="number" id="timerSeconds" min="0" max="59" placeholder="秒">
+            </div>
+            <div class="timer-quick-btns">
+              <button class="quick-btn" data-mins="5">5分</button>
+              <button class="quick-btn" data-mins="10">10分</button>
+              <button class="quick-btn" data-mins="15">15分</button>
+              <button class="quick-btn" data-mins="30">30分</button>
+              <button class="quick-btn" data-mins="60">60分</button>
+            </div>
+          </div>
+          <div class="timer-form-group">
+            <label>卡片颜色</label>
+            <div class="timer-colors">
+              <div class="color-picker-group">
+                <span>背景</span>
+                <input type="color" id="timerBgColor" value="#2a2235">
+              </div>
+              <div class="color-picker-group">
+                <span>边框</span>
+                <input type="color" id="timerBorderColor" value="#735186">
+              </div>
+              <div class="color-picker-group">
+                <span>文字</span>
+                <input type="color" id="timerTextColor" value="#e9c0fd">
+              </div>
+              <div class="color-picker-group">
+                <span>结束色</span>
+                <input type="color" id="timerEndColor" value="#e74c3c">
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="timer-countdown urgent" id="timer-event">02:34:15</div>
+        <div class="timer-modal-footer">
+          <button class="timer-btn-save-preset" id="timerBtnSavePreset">
+            <i class="fas fa-bookmark"></i> 保存预设
+          </button>
+          <button class="timer-btn-cancel" id="timerBtnCancel">取消</button>
+          <button class="timer-btn-confirm" id="timerBtnConfirm">确认添加</button>
+        </div>
       </div>
     </div>
 
