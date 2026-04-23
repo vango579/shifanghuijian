@@ -854,6 +854,15 @@ aside.sidebar > nav.sidebar-nav > a.nav-btn:nth-child(2) > span.nav-text {
   line-height: 1.5;
 }
 
+.hero-notice {
+  font-size: 12px;
+  color: rgba(255, 193, 7, 0.8);
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.5;
+}
+
 /* 下载容器 */
 .download-container {
   position: relative;
